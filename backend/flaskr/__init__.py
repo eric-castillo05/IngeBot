@@ -19,6 +19,6 @@ class FirestoreClient():
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    db = FirestoreClient.get_instance(app.config['DATABASE'])
+    db = FirestoreClient.get_instance(app.config['SECRET_KEY'])
     app.config['db'] = db
     return app
