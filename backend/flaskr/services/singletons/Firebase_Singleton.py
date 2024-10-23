@@ -14,7 +14,7 @@ class FirebaseAppSingleton:
             raise Exception("This is a singleton!")
         else:
             # Init Firebase App only once
-            cred = credentials.Certificate('/home/aldo/IngeBot/backend/flaskr/services/ingebot-5c0de-firebase-adminsdk-46g76-1519602298.json')
+            cred = credentials.Certificate('/home/aldo/IngeBot/backend/ingebot_key.json')
             self.app = initialize_app(cred, {'storageBucket': 'ingebot-5c0de.appspot.com'})  # Inicializa la app
             FirebaseAppSingleton.__instance = self
 
