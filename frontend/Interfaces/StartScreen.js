@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         width:350,
         height:350,
         resizeMode:'contain',
-        marginTop: 100,
+        marginTop: 200,
     },
     logoText: {
         fontSize: 48,
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     tagline: {
         fontSize: 16,
         color: '#a8bfc9',
-        marginBottom: 250,
+        marginBottom: 100,
         textAlign: 'bottom',
     },
     button: {
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         paddingHorizontal: 180,
         borderRadius: 20,
+        marginTop: 100,
     },
     buttonText: {
         fontSize: 18,

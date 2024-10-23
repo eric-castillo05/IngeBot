@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Keyboard, TextInput, TouchableOpacity, StatusBar, TouchableWithoutFeedback, Alert } from 'react-native';
 import axios from 'axios';
 import { CommonActions } from '@react-navigation/native';
 import {Ionicons} from "@expo/vector-icons";
+import { useState } from 'react';
 
 const SignIn = ({navigation}) => {
     const [NumCtl, setNum] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
@@ -40,6 +41,7 @@ const SignIn = ({navigation}) => {
                 <View style={styles.circleBottomR}></View>
                 <View style={styles.circleTopR}></View>
                 <View style={styles.circleTopRR}></View>
+                <View style={styles.circleBottomRR}></View>
 
                 <Ionicons
                     name="arrow-back"
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
         left: 20,
     },
     title: {
-        fontSize: 36,
+        fontSize: 52,
         fontWeight: 'bold',
         color: '#000',
         marginTop: 150,
@@ -148,12 +150,12 @@ const styles = StyleSheet.create({
     circleBottomL: {
         position: 'absolute',
         width: 400,
-        height: 400,
+        height: 520,
         borderRadius: 200,
-        backgroundColor: '#002540',
-        bottom: -100,
-        left: -100,
-        zIndex: -1,
+        backgroundColor: '#E9E7E7',
+        bottom: 0,
+        left: -160,
+        zIndex: -2,
     },
     circleBottomR: {
         position: 'absolute',
@@ -162,8 +164,18 @@ const styles = StyleSheet.create({
         borderRadius: 200,
         backgroundColor: '#97E4FF',
         bottom: -150,
-        right: -100,
+        right: -70,
         zIndex: -1, // Asegura que el círculo esté detrás
+    },
+    circleBottomRR: {
+        position: 'absolute',
+        width: 400,
+        height: 400,
+        borderRadius: 200,
+        backgroundColor: '#002540',
+        bottom: 110,
+        right: -100,
+        zIndex: -2, // Asegura que el círculo esté detrás
     },
     circleTopR: {
         position: 'absolute',
