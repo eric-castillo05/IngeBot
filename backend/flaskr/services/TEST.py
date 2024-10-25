@@ -8,9 +8,9 @@ from flaskr.services.Tasks_Service import Tasks_Service
 
 from flaskr.services.iFirebase import iFirebase
 
-from flaskr.services.singletons.Firebase_Singleton import FirebaseAppSingleton
-from flaskr.services.singletons.Firestore_Singleton import FirestoreSingleton
-from flaskr.services.singletons.Storage_Singleton import StorageBucketSingleton
+from flaskr.services.singletons.FirebaseAppSingleton import FirebaseAppSingleton
+from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
+from flaskr.services.singletons.StorageBucketSingleton import StorageBucketSingleton
 
 # Get Firestore instance
 db_instance = FirestoreSingleton.get_instance()

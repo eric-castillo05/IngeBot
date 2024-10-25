@@ -3,8 +3,8 @@ from flaskr.models import User
 from firebase_admin import auth #Authentication service
 
 from flaskr.models.task_model import iTask
-from flaskr.services.singletons.Firestore_Singleton import FirestoreSingleton
-from flaskr.services.singletons.Storage_Singleton import StorageBucketSingleton
+from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
+from flaskr.services.singletons.StorageBucketSingleton import StorageBucketSingleton
 
 
 class iFirebase:

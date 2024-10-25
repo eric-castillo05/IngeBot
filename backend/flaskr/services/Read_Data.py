@@ -1,6 +1,6 @@
 import json
 
-from flaskr.services.singletons.Firestore_Singleton import FirestoreSingleton
+from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 
 
 class Read_Data:

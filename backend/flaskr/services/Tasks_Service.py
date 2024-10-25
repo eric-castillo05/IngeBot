@@ -1,4 +1,4 @@
-from flaskr.services.singletons.Firestore_Singleton import FirestoreSingleton
+from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 
 class Tasks_Service:
 

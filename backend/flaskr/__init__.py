@@ -1,24 +1,19 @@
-import firebase_admin
-from firebase_admin import credentials, firestore
 from flask import Flask
 from flaskr.config import Config
-
-
-class FirestoreClient():
-    _instance = None
-
-    @classmethod
-    def get_instance(cls, cred_path):
-        if cls._instance is None:
-            cred = credentials.Certificate(cred_path)
-            firebase_admin.initialize_app(cred)
-            cls._instance = firestore.client()
-        return cls._instance
-
+from flaskr.services.singletons.FirebaseAppSingleton import FirebaseAppSingleton
+from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    db = FirestoreClient.get_instance(app.config['SECRET_KEY'])
-    app.config['db'] = db
+
+    try:
+        firebase_app = FirebaseAppSingleton().app
+
+        db = FirestoreSingleton().client
+        app.config['db'] = db
+
+    except Exception as e:
+        raise RuntimeError(f'Failed to initialize Firebase or Firestore: {str(e)}')
+
     return app

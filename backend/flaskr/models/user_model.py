@@ -1,5 +1,3 @@
-
-
 class User:
     def __init__(self, first_name: str, middle_name: str, last_name: str, control_number: str, email: str,
                  password: str, imagePath):
