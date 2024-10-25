@@ -4,19 +4,17 @@ from flaskr.utils.singleton_meta import SingletonMeta
 
 
 class FirestoreSingleton(metaclass=SingletonMeta):
-    def __init__(self):
-        self.db = None
-        self._initialize()
+    _instance = None
+    _client = None
 
-    def _initialize(self):
-        try:
-            firebase_app = FirebaseAppSingleton()
-            self.db = firestore.client(app=firebase_app.app)
-        except Exception as e:
-            raise RuntimeError(f'Failed to initialize Firestore client: {e}')
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(FirestoreSingleton, cls).__new__(cls)
+        return cls._instance
 
     @property
     def client(self):
-        if self.db is None:
-            raise RuntimeError('Firestore client is not initialized')
-        return self.db
+        if self._client is None:
+            FirebaseAppSingleton().app
+            self._client = firestore.client()
+        return self._client

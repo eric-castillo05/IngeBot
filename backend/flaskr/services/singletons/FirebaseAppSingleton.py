@@ -1,29 +1,29 @@
+import firebase_admin
 from firebase_admin import credentials, initialize_app
 from flaskr.config import Config
 from flaskr.utils.singleton_meta import SingletonMeta
 
 
 class FirebaseAppSingleton(metaclass=SingletonMeta):
-    def __init__(self):
-        self._app = None
-        self._initialize()
+    _instance = None
+    _initialized = False
 
-    def _initialize(self):
-        cred_path = Config.SECRET_KEY
-        bucket_name = Config.BUCKET_NAME
-        if not cred_path or not bucket_name:
-            raise ValueError('Credentials or bucket name missing from configuration.')
-
-        try:
-            cred = credentials.Certificate(cred_path)
-            self._app = initialize_app(cred, {
-                'storageBucket': bucket_name
-            })
-        except Exception as e:
-            raise RuntimeError(f'Failed to initialize Firebase app: {e}')
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(FirebaseAppSingleton, cls).__new__(cls)
+        return cls._instance
 
     @property
     def app(self):
-        if self._app is None:
-            raise RuntimeError('Firebase app not initialized')
-        return self._app
+        if not self._initialized:
+            self._initialize()
+        return firebase_admin.get_app()
+
+    def _initialize(self):
+        if not self._initialized:
+            try:
+                cred = credentials.Certificate(Config.SECRET_KEY)
+                firebase_admin.initialize_app(cred)
+                self._initialized = True
+            except ValueError:
+                pass
