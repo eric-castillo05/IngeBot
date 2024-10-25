@@ -1,8 +1,5 @@
 from typing import List
 
-
-
-
 class Priority:
     LOW: 'low'
     MEDIUM: 'medium'
@@ -16,8 +13,6 @@ class iTask:
         self.description = description
         self.priority = priority
         self.due_date = due_date
-
-
 
     def to_dict(self):
         return {
