@@ -3,10 +3,10 @@ from firebase_admin import credentials, initialize_app
 from flaskr.config import Config
 from flaskr.utils.singleton_meta import SingletonMeta
 
-
 class FirebaseAppSingleton(metaclass=SingletonMeta):
     _instance = None
     _initialized = False
+    _app = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -17,13 +17,15 @@ class FirebaseAppSingleton(metaclass=SingletonMeta):
     def app(self):
         if not self._initialized:
             self._initialize()
-        return firebase_admin.get_app()
+        return self._app
 
     def _initialize(self):
         if not self._initialized:
             try:
                 cred = credentials.Certificate(Config.SECRET_KEY)
-                firebase_admin.initialize_app(cred)
+                self._app = firebase_admin.initialize_app(cred, {
+                    'storageBucket': Config.BUCKET_NAME
+                })
                 self._initialized = True
             except ValueError:
-                pass
+                self._app =  firebase_admin.get_app()

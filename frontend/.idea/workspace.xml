@@ -5,17 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="243955c2-288a-48a7-a79d-fd9017454344" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/FrontEnd.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Interfaces/CircleTransition.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Interfaces/EmpecemosScreen.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Interfaces/SignIn.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Interfaces/StartScreen.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/Bot.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/Logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/flaskr/routes/user_routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/flaskr/services/user_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/flaskr/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/flaskr/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/flaskr/services/Read_Data.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/flaskr/services/TEST.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/flaskr/services/Tasks_Service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/flaskr/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/flaskr/services/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/flaskr/services/iFirebase.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,9 +53,9 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;refactor/all-code&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/diego-gallegos/WorkSpace/IngeBot/FrontEnd/assets&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/eric/Documents/dev/IngeBot/frontend&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -75,8 +73,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.23726.96" />
       </set>
     </attachedChunks>
   </component>
@@ -92,6 +89,8 @@
       <workItem from="1729644936798" duration="585000" />
       <workItem from="1729646636645" duration="3139000" />
       <workItem from="1729649795367" duration="975000" />
+      <workItem from="1729695009735" duration="258000" />
+      <workItem from="1729879751971" duration="5000" />
     </task>
     <servers />
   </component>
