@@ -1,8 +1,8 @@
-from datetime import datetime
 from firebase_admin import auth
 from flaskr.models import User
 from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 from flaskr.services.singletons.StorageBucketSingleton import StorageBucketSingleton
+from flaskr.utils.current_timestamp import CurrentTimestamp
 
 class UserService:
     def __init__(self, user: User):
@@ -11,7 +11,6 @@ class UserService:
     def create_user(self, image_file):
         try:
             db_instance = FirestoreSingleton().client
-            print(self.user.email)
             user_record = auth.create_user(
                 email=self.user.email,
                 email_verified=False,
@@ -29,7 +28,7 @@ class UserService:
                 'control_number': self.user.control_number,
                 'email': self.user.email,
                 'image_path': f'user_profile/{user_record.uid}/{image_file.filename}',
-                'created_at': self.get_current_timestamp(),
+                'created_at': CurrentTimestamp.get_current_timestamp()
             }
             db_instance.collection('users').document(user_record.uid).set(user_data)
             return True
@@ -60,7 +59,3 @@ class UserService:
         except Exception as e:
             print(f'Error uploading image: {str(e)}')
             return None
-
-    @staticmethod
-    def get_current_timestamp():
-        return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
