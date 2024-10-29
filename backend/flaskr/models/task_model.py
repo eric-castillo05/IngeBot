@@ -6,8 +6,8 @@ class Priority:
     HIGH: 'high'
 
 class Task:
-    def __init__(self, task_id: str, title: str, description: str, priority: Priority, subtasks: List = []):
-        self.task_id = task_id
+    def __init__(self, uid: str, title: str, description: str, priority: Priority, subtasks: List = []):
+        self.uid = uid
         self.title = title
         self.description = description
         self.priority = priority
@@ -15,7 +15,7 @@ class Task:
 
     def to_dict(self):
         return {
-            'task_id': self.task_id,
+            'uid': self.uid,
             'title': self.title,
             'description': self.description,
             'priority': self.priority,
