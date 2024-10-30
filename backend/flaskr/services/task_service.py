@@ -65,6 +65,39 @@ class SubtaskService:
 
 class Retrieve:
     @staticmethod
+    def fetch_user_doc(uid):
+        db_instance = FirestoreSingleton().client
+        document_ref = db_instance.collection('users').document(uid)
+
+        data = Retrieve._fetch_document_with_subcollections(document_ref)
+        return data
+
+    @staticmethod
+    def _fetch_document_with_subcollections(document_ref):
+        """
+        Fetch the document and recursively fetch subcollections.
+        """
+        data = {}
+
+        # Get the document data
+        document_data = document_ref.get().to_dict()
+
+        # Add the document data to the result
+        if document_data:
+            data['data'] = document_data
+
+        # Get subcollections
+        subcollections = document_ref.collections()
+
+        for subcollection in subcollections:
+            subcollection_data = []
+            for doc in subcollection.stream():
+                # Use the document reference to fetch its data
+                subcollection_data.append(Retrieve._fetch_document_with_subcollections(doc.reference))
+            data[subcollection.id] = subcollection_data
+
+        return data
+    @staticmethod
     def find_subtask(uid, task_id, subtask_id):
         """
         Retrieve a subtask by its ID, given the user ID and task ID.

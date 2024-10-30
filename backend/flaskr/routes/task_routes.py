@@ -99,3 +99,19 @@ def get_subtask():
     except Exception as e:
         print(f"Error retrieving subtask: {str(e)}")
         return jsonify({"message": f"Error retrieving subtask: {str(e)}"}), 500
+
+@task_bp.route('/user/fetch', methods=['GET'])
+def get_user():
+    try:
+        data = request.form
+        uid = data.get('uid')
+
+        user_doc = Retrieve.fetch_user_doc(uid=uid)
+        if user_doc:
+            return jsonify(user_doc), 200
+        else:
+            return jsonify({"message": "User not found"}), 404
+
+    except Exception as e:
+        print(f"Error retrieving user: {str(e)}")
+        return jsonify({"message": f"Error retrieving User info: {str(e)}"}), 500
