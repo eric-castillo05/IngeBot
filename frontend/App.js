@@ -5,6 +5,8 @@ import StartScreen from "./Interfaces/StartScreen";
 import EmpecemosScreen from "./Interfaces/EmpecemosScreen";
 import SignIn from "./Interfaces/SignIn";
 import SignUp from "./Interfaces/SignUp";
+import MainScreen from "./Interfaces/MainScreen";
+import ChatBotScreen from "./Interfaces/ChatBotScreen";
 
 const Stack = createStackNavigator();
 
@@ -13,13 +15,15 @@ export default function App() {
         <NavigationContainer>
             <Stack.Navigator
                 screenOptions={{
-                    headerShown: false, // Oculta el encabezado en todas las pantallas
+                    headerShown: true, // Oculta el encabezado en todas las pantallas
                 }}
             >
+                <Stack.Screen name="Main" component={MainScreen} />
                 <Stack.Screen name="Start" component={StartScreen} />
                 <Stack.Screen name="Empecemos" component={EmpecemosScreen} />
                 <Stack.Screen name="SignIn" component={SignIn} />
                 <Stack.Screen name="SignUp" component={SignUp} />
+                <Stack.Screen name="ChatBot" component={ChatBotScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

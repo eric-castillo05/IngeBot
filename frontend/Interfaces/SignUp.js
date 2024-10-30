@@ -4,8 +4,10 @@ import { useState } from 'react';
 import {Ionicons} from "@expo/vector-icons";
 
 const SignUp = ({navigation}) => {
-    const [correo, setCorreo] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
-    const [NumCtl, setNum] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
+    const [name , setName] = useState('');
+    const [last_name, setLast_name] = useState('');
+    const [email, setEmail ] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
+    const [control_number, setControl_Number] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
     const [password, setPassword] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
     const [confirmPassword, setConfirmPassword] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
 
@@ -15,12 +17,14 @@ const SignUp = ({navigation}) => {
             return;
         }
         const registrationData = {
-            correo,
-            NumCtl,
+            name,
+            last_name,
+            email,
+            control_number,
             password
         };
         try {
-            const response = await fetch('http://backend_aldo_y_eric/registro', { // Cambiar por la URL abckend
+            const response = await fetch('http://', { // Cambiar por la URL abckend
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -60,13 +64,33 @@ const SignUp = ({navigation}) => {
 
 
                     <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Nombre"
+                            placeholderTextColor="#8c8c8c"
+                            value={name}
+                            onChangeText={setName}
+                        />
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Apellido"
+                            placeholderTextColor="#8c8c8c"
+                            value={last_name}
+                            onChangeText={setLast_name}
+                        />
+                    </View>
+
+                    <View style={styles.inputContainer}>
                         <Text style={styles.icon}>📧</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Correo Institucional"
                             placeholderTextColor="#8c8c8c"
-                            value={correo}
-                            onChangeText={setCorreo}
+                            value={email}
+                            onChangeText={setEmail}
                             keyboardType="email-address"
                         />
                     </View>
@@ -78,9 +102,8 @@ const SignUp = ({navigation}) => {
                             style={styles.input}
                             placeholder="Número de Control"
                             placeholderTextColor="#8c8c8c"
-                            value={NumCtl}
-                            onChangeText={setNum}
-                            keyboardType="numeric"
+                            value={control_number}
+                            onChangeText={setControl_Number}
                         />
                     </View>
 
