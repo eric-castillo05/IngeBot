@@ -20,7 +20,7 @@ const SignIn = ({navigation}) => {
                 navigation.dispatch(
                     CommonActions.reset({
                         index: 0,
-                        routes: [{name: 'Estudiante'}],
+                        routes: [{name: 'Main'}],
                     })
                 );
                 return;
@@ -62,7 +62,7 @@ const SignIn = ({navigation}) => {
                     placeholderTextColor="#8c8c8c"
                     value={NumCtl}
                     onChangeText={setNum}
-                    keyboardType="numeric"
+                    keyboardType={"email-address"}
                 />
                 <TextInput
                     style={styles.input}
