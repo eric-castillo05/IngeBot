@@ -1,44 +1,63 @@
-from flaskr.services.singletons.Firestore_Singleton import FirestoreSingleton
+from tkinter.constants import SEL_FIRST
 
+from flaskr.models import Task, Subtask
+from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 from flaskr.utils import CurrentTimestamp
 
 
-class TasksService:
-    @staticmethod
-    def createTask(title, description, due_date, priority, uid):
+class TaskService:
+    def __init__(self, task:Task):
+        self.task = task
+
+    def create_task(self, uid):
         try:
             # Get Firestore instance
-            db_instance = FirestoreSingleton.get_instance()
-            db = db_instance.db  # Access the Firestore client
-            taskData = {
-                'title': title,
-                'description': description,
+            db_instance = FirestoreSingleton().client
+
+            task_data = {
+                'title': self.task.title,
+                'description': self.task.description,
                 'createdAt': CurrentTimestamp.get_current_timestamp(),
-                'due_date': due_date,
-                'priority': priority,
+                'due_date': self.task.due_date,
+                'priority': self.task.priority,
+
+
             }
-            user_ref = db.collection('Users').document(uid)
-            new_task_ref = user_ref.collection('Tasks').document(title)
+            # Find "User" document within the "Users" collection with "uid"
+            user_ref = db_instance.collection('users').document(uid)
+            #Create a "Task" document based on the "user_ref"
+            task_ref = user_ref.collection('Tasks').document()
             # Set the task data in Firestore
-            new_task_ref.set(taskData)
+            task_ref.set(task_data)
+            return True
         except Exception as e:
-            print(e)
-    @staticmethod
-    def createSubtask(taskTitle, subtaskTitle, description, uid):
-        # Get Firestore instance
-        db_instance = FirestoreSingleton.get_instance()
-        db = db_instance.db  # Access the Firestore client
-        userUID = uid
-        subaskData = {
-            'subtaskTitle': subtaskTitle,
-            'description': description,
-            'createdAt': Tasks_Service.getCurrentTimestamp(),  # Use Firestore's server timestamp
-        }
-        task_ref = db.collection('Users').document(userUID).collection('Tasks')
-        task_ref.document(taskTitle).collection('Subtasks').document(subtaskTitle).set(subaskData)
-    @staticmethod
-    def getCurrentTimestamp():
-        from datetime import datetime
-        current_timestamp = datetime.now()
-        formatted_timestamp = current_timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        return formatted_timestamp
+            print(f'Error creating task{str(e)}')
+            return False
+
+
+class SubtaskService:
+    def __init__(self, subtask: Subtask):
+        self.subtask = subtask
+
+    def create_subtask(self, uid, task_id):
+        try:
+            # Get Firestore instance
+            db_instance = FirestoreSingleton().client
+
+            # Prepare subtask data with specified attributes
+            subtask_data = {
+                'subtaskTitle': self.subtask.title,
+                'description': self.subtask.description,
+                'createdAt': CurrentTimestamp.get_current_timestamp(),
+            }
+
+            # Find the task collection and subtask collection based on task_id
+            task_ref = db_instance.collection('users').document(uid).collection('Tasks').document(task_id).collection(
+                'Subtasks').document()
+
+            # Set subtask data in Firestore
+            task_ref.set(subtask_data)
+            return True
+        except Exception as e:
+            print(f'Error creating subtask: {str(e)}')
+            return False

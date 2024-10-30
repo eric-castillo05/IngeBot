@@ -1,10 +1,10 @@
 class Subtask:
-    def __init__(self, subtask_id: str, title: str):
-        self.subtask_id = subtask_id
+    def __init__(self, title: str, description: str):
         self.title = title
+        self.description = description
 
     def to_dict(self):
         return {
-            'subtask_id': self.subtask_id,
-            'title': self.title
+            'title': self.title,
+            'description': self.description
         }
