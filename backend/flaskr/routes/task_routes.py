@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flaskr.models import Task, Subtask
-from flaskr.services.task_service import TaskService, SubtaskService
+from flaskr.services.task_service import TaskService, SubtaskService, Retrieve
 from flaskr.utils import CurrentTimestamp
 
 task_bp = Blueprint('task', __name__)
@@ -72,3 +72,30 @@ def create_subtask():
     except Exception as e:
         print(f"Error in create_subtask: {str(e)}")
         return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+
+
+
+
+@task_bp.route('/subtasks/get', methods=['GET'])
+def get_subtask():
+    try:
+        data = request.form
+        uid = data.get('uid')
+        task_id = data.get('task_id')
+        subtask_id = data.get('subtask_id')
+
+        #uid = "Yd1O5nPJWOTSFAEfB8dJ7hQzyP22"
+        #task_id ="rC1CKCNYcjSl9RvZgfZP"
+        #subtask_id ="M6nkwrZ3YhmwZjYGaREA"
+        subtask = Retrieve.find_subtask(uid=uid, task_id=task_id, subtask_id=subtask_id)
+
+        # Return the result
+        if subtask:
+            return jsonify(subtask), 200
+        else:
+            return jsonify({"message": "Subtask not found"}), 404
+
+    except Exception as e:
+        print(f"Error retrieving subtask: {str(e)}")
+        return jsonify({"message": f"Error retrieving subtask: {str(e)}"}), 500

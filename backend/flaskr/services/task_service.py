@@ -61,3 +61,33 @@ class SubtaskService:
         except Exception as e:
             print(f'Error creating subtask: {str(e)}')
             return False
+
+
+class Retrieve:
+    @staticmethod
+    def find_subtask(uid, task_id, subtask_id):
+        """
+        Retrieve a subtask by its ID, given the user ID and task ID.
+
+        :param uid: User ID
+        :param task_id: Task ID
+        :param subtask_id: Subtask ID
+        :return: Subtask data as a dictionary if found, else None
+        """
+
+        try:
+            db_instance = FirestoreSingleton().client
+            subtask_ref = db_instance.collection('users').document(uid).collection('Tasks').document(
+                task_id).collection('Subtasks').document(subtask_id)
+
+            subtask_doc = subtask_ref.get()
+            if subtask_doc.exists:
+                return subtask_doc.to_dict()
+            else:
+                return None
+
+        except Exception as e:
+            print(f"Error querying subtask by ID: {str(e)}")
+            return None
+
+
