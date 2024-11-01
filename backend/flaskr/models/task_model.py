@@ -1,6 +1,8 @@
 from typing import List
 
 from flaskr.models import Subtask
+from flaskr.utils import DateFormater
+
 
 class Priority:
     LOW = 'low'
@@ -12,7 +14,7 @@ class Task:
         self.title = title
         self.description = description
         self.priority = priority
-        self.due_date = due_date
+        self.due_date = DateFormater.dateFormat(due_date)
 
 
     def to_dict(self):

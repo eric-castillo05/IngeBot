@@ -1,6 +1,10 @@
+from firebase_admin import auth
 from flask import Blueprint, request, jsonify
 from flaskr.models import User
+from flaskr.services import user_service
+from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 from flaskr.services.user_service import UserService
+from flaskr.utils import CurrentTimestamp
 
 user_bp = Blueprint('user', __name__)
 
@@ -47,3 +51,67 @@ def create_user():
     except Exception as e:
         print(f"Error in create_user: {str(e)}")
         return jsonify({'message': f'Error creating user: {str(e)}'}), 500
+
+
+@user_bp.route('/users/<uid>', methods=['DELETE'])
+def delete_user(uid):
+    try:
+        user_service = UserService(None)
+        success, message = user_service.delete_user(uid)
+
+        if success:
+            return jsonify({'message': message}), 200
+        return jsonify({'message': message}), 404
+
+    except Exception as e:
+        return jsonify({'message': f'Error eliminando usuario: {str(e)}'}), 500
+
+
+@user_bp.route('/users/<uid>', methods=['PUT'])
+def update_user(uid):
+    try:
+        if not request.form and 'image' not in request.files:
+            return jsonify({'message': 'No data provided for update'}), 400
+
+        # Gather fields to update
+        update_data = {}
+        allowed_fields = ['email', 'first_name', 'middle_name', 'last_name',
+                          'control_number', 'password', 'display_name']
+
+        for field in allowed_fields:
+            if field in request.form:
+                update_data[field] = request.form[field]
+
+        image_file = request.files.get('image')
+
+        if not update_data and not image_file:
+            return jsonify({'message': 'No valid fields provided for update'}), 400
+
+        user_service = UserService(None)
+        success, message = user_service.update_user(uid, update_data, image_file)
+
+        if success:
+            return jsonify({'message': message}), 200
+        return jsonify({'message': message}), 400
+
+    except Exception as e:
+        print(f"Error in update_user: {str(e)}")
+        return jsonify({'message': f'Error updating user: {str(e)}'}), 500
+
+
+
+@user_bp.route('/users/<uid>', methods=['GET'])
+def get_user(uid):
+    try:
+        user_service = UserService(None)
+        user_data, message = user_service.get_user(uid)
+
+        if user_data:
+            return jsonify({
+                'message': message,
+                'user': user_data
+            }), 200
+        return jsonify({'message': message}), 404
+
+    except Exception as e:
+        return jsonify({'message': f'Error obteniendo usuario: {str(e)}'}), 500

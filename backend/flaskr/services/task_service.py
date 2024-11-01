@@ -1,5 +1,3 @@
-from tkinter.constants import SEL_FIRST
-
 from flaskr.models import Task, Subtask
 from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 from flaskr.utils import CurrentTimestamp
@@ -20,8 +18,6 @@ class TaskService:
                 'createdAt': CurrentTimestamp.get_current_timestamp(),
                 'due_date': self.task.due_date,
                 'priority': self.task.priority,
-
-
             }
             # Find "User" document within the "Users" collection with "uid"
             user_ref = db_instance.collection('users').document(uid)
@@ -33,6 +29,44 @@ class TaskService:
         except Exception as e:
             print(f'Error creating task{str(e)}')
             return False
+
+    def update_task(self, uid, task_id):
+        try:
+            db_instance = FirestoreSingleton().client
+            task_ref = db_instance.collection('users').document(uid).collection('Tasks').document(task_id)
+            task_data = {
+                'title': self.task.title,
+                'description': self.task.description,
+                'due_date': self.task.due_date,
+                'priority': self.task.priority,
+                'updatedAt': CurrentTimestamp.get_current_timestamp()
+            }
+            task_ref.update(task_data)
+            return True
+        except Exception as e:
+            print(f'Error updating task: {str(e)}')
+            return False
+
+    def delete_task(self, uid, task_id):
+        try:
+            db_instance = FirestoreSingleton().client
+            task_ref = db_instance.collection('users').document(uid).collection('Tasks').document(task_id)
+            task_ref.delete()
+            return True
+        except Exception as e:
+            print(f'Error deleting task: {str(e)}')
+            return False
+
+    @staticmethod
+    def get_task(uid, task_id):
+        try:
+            db_instance = FirestoreSingleton().client
+            task_ref = db_instance.collection('users').document(uid).collection('Tasks').document(task_id)
+            task_doc = task_ref.get()
+            return task_doc.to_dict() if task_doc.exists else None
+        except Exception as e:
+            print(f'Error retrieving task: {str(e)}')
+            return None
 
 
 class SubtaskService:
@@ -61,6 +95,42 @@ class SubtaskService:
         except Exception as e:
             print(f'Error creating subtask: {str(e)}')
             return False
+
+    def update_subtask(self, uid, task_id, subtask_id):
+        try:
+            db_instance = FirestoreSingleton().client
+            subtask_ref = db_instance.collection('users').document(uid).collection('Tasks').document(task_id).collection('Subtasks').document(subtask_id)
+            subtask_data = {
+                'subtaskTitle': self.subtask.title,
+                'description': self.subtask.description,
+                'updatedAt': CurrentTimestamp.get_current_timestamp()
+            }
+            subtask_ref.update(subtask_data)
+            return True
+        except Exception as e:
+            print(f'Error updating subtask: {str(e)}')
+            return False
+
+    def delete_subtask(self, uid, task_id, subtask_id):
+        try:
+            db_instance = FirestoreSingleton().client
+            subtask_ref = db_instance.collection('users').document(uid).collection('Tasks').document(task_id).collection('Subtasks').document(subtask_id)
+            subtask_ref.delete()
+            return True
+        except Exception as e:
+            print(f'Error deleting subtask: {str(e)}')
+            return False
+
+    @staticmethod
+    def get_subtask(uid, task_id, subtask_id):
+        try:
+            db_instance = FirestoreSingleton().client
+            subtask_ref = db_instance.collection('users').document(uid).collection('Tasks').document(task_id).collection('Subtasks').document(subtask_id)
+            subtask_doc = subtask_ref.get()
+            return subtask_doc.to_dict() if subtask_doc.exists else None
+        except Exception as e:
+            print(f'Error retrieving subtask: {str(e)}')
+            return None
 
 
 class Retrieve:

@@ -59,3 +59,113 @@ class UserService:
         except Exception as e:
             print(f'Error uploading image: {str(e)}')
             return None
+
+
+    def delete_user(self, uid: str):
+        try:
+            db_instance = FirestoreSingleton().client
+
+            user_ref = db_instance.collection('users').document(uid)
+            user_data = user_ref.get()
+
+            if not user_data.exists:
+                return False, "Usuario no encontrado"
+
+            if user_data.to_dict().get('image_path'):
+                try:
+                    bucket = StorageBucketSingleton().storage_bucket
+                    blob = bucket.blob(user_data.to_dict()['image_path'])
+                    blob.delete()
+                except Exception as e:
+                    print(f'Error eliminando imagen: {str(e)}')
+
+            auth.delete_user(uid)
+
+            user_ref.delete()
+
+            return True, "Usuario eliminado exitosamente"
+        except Exception as e:
+            print(f'Error eliminando usuario: {str(e)}')
+            return False, str(e)
+
+    def update_user(self, uid: str, update_data: dict, image_file=None):
+        try:
+            db_instance = FirestoreSingleton().client
+            user_ref = db_instance.collection('users').document(uid)
+
+            user_doc = user_ref.get()
+            if not user_doc.exists:
+                return False, "User not found"
+
+            auth_update = {}
+            if 'email' in update_data:
+                current_user = auth.get_user(uid)
+                if current_user.email != update_data['email']:
+                    try:
+                        auth.get_user_by_email(update_data['email'])
+                        return False, "Email is already in use by another user"
+                    except auth.UserNotFoundError:
+                        auth_update['email'] = update_data['email']
+            if 'first_name' in update_data:
+                auth_update['display_name'] = update_data['first_name']
+            if 'password' in update_data:
+                auth_update['password'] = update_data['password']
+
+            if auth_update:
+                auth.update_user(uid, **auth_update)
+
+            if image_file:
+                try:
+                    current_data = user_doc.to_dict()
+                    if 'image_path' in current_data:
+                        bucket = StorageBucketSingleton().storage_bucket
+                        old_blob = bucket.blob(current_data['image_path'])
+                        old_blob.delete()
+
+                    # Upload new image
+                    new_image_url = self.upload_image(image_file, uid)
+                    if new_image_url:
+                        update_data['image_path'] = new_image_url
+                except Exception as e:
+                    print(f'Error handling image: {str(e)}')
+
+
+            update_data.pop('password', None)
+
+            update_data['updated_at'] = CurrentTimestamp.get_current_timestamp()
+
+
+            if update_data:
+                user_ref.update(update_data)
+
+            return True, "User successfully updated"
+
+        except Exception as e:
+            print(f'Error updating user: {str(e)}')
+            return False, f"Error updating user: {str(e)}"
+
+
+    def get_user(self, uid: str):
+        try:
+            db_instance = FirestoreSingleton().client
+            user_doc = db_instance.collection('users').document(uid).get()
+
+            if not user_doc.exists:
+                return None, "Usuario no encontrado"
+
+            user_data = user_doc.to_dict()
+
+            # Obtener URL pública de la imagen si existe
+            if user_data.get('image_path'):
+                try:
+                    bucket = StorageBucketSingleton().storage_bucket
+                    blob = bucket.blob(user_data['image_path'])
+                    user_data['image_url'] = blob.public_url
+                except Exception as e:
+                    print(f'Error obteniendo URL de imagen: {str(e)}')
+                    user_data['image_url'] = None
+
+            return user_data, "Usuario encontrado exitosamente"
+        except Exception as e:
+            print(f'Error obteniendo usuario: {str(e)}')
+            return None, str(e)
