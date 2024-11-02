@@ -1,23 +1,23 @@
 
 from flask import Blueprint, request, jsonify
+from werkzeug.utils import secure_filename
+
 from flaskr.models import User
+from flaskr.services.singletons.StorageBucketSingleton import StorageBucketSingleton
 
 from flaskr.services.user_service import UserService
 
 
 user_bp = Blueprint('user', __name__)
-
 @user_bp.route('/users/register', methods=['POST'])
 def create_user():
     try:
+        # Check if form data and image file are provided
         if not request.form:
             return jsonify({'message': 'No form data provided'}), 400
 
-        if 'image' not in request.files:
-            return jsonify({'message': 'No image file provided'}), 400
-
-        image_file = request.files['image']
-        if image_file.filename == '':
+        image_file = request.files.get('image')  # Use get() to avoid KeyError if 'image' is missing
+        if image_file and image_file.filename == '':
             return jsonify({'message': 'No selected image file'}), 400
 
         data = request.form
@@ -28,28 +28,57 @@ def create_user():
             control_number=data.get('control_number'),
             email=data.get('email'),
             password=data.get('password'),
-            image_path=None
+            image_path=(image_file if image_file is not None else None)  # This will be set after uploading the image if provided
         )
 
-        required_fields = ['first_name', 'middle_name', 'last_name', 'control_number', 'password']
+         #Required fields including 'email'
+        required_fields = ['first_name', 'middle_name', 'last_name', 'control_number', 'email', 'password']
         missing_fields = [field for field in required_fields if not data.get(field)]
 
+        # Return error if any required field is missing
         if missing_fields:
             return jsonify({
                 'message': 'Missing required fields',
                 'missing_fields': missing_fields
             }), 400
 
+        # Instantiate UserService with the user object and create the user
         user_service = UserService(user)
         result = user_service.create_user(image_file)
 
         if result:
             return jsonify({'message': 'User created successfully.'}), 201
-        return jsonify({'message': 'User could not be created.'}), 400
+        else:
+            return jsonify({'message': 'User could not be created due to an internal error.'}), 500
 
     except Exception as e:
         print(f"Error in create_user: {str(e)}")
         return jsonify({'message': f'Error creating user: {str(e)}'}), 500
+
+
+@user_bp.route('/update_profile_picture/<user_uid>', methods=['POST'])
+def update_profile_picture(user_uid):
+    if 'image' not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    # Secure the filename to avoid unsafe characters
+    filename = secure_filename(file.filename)
+
+    # Call the upload_image function to delete any existing image and upload the new one
+    u = UserService(None)
+    url = u.upload_image(file, user_uid)
+
+    if url:
+        return jsonify({"message": "Profile picture updated successfully", "url": url}), 200
+    else:
+        return jsonify({"error": "Failed to update profile picture"}), 500
+
+
+
 
 
 @user_bp.route('/users/<uid>', methods=['DELETE'])

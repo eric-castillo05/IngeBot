@@ -4,13 +4,60 @@ from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 from flaskr.services.singletons.StorageBucketSingleton import StorageBucketSingleton
 from flaskr.utils.current_timestamp import CurrentTimestamp
 
+
+
+from werkzeug.utils import secure_filename
+import os
 class UserService:
     def __init__(self, user: User):
         self.user = user
 
+
+
+    def upload_image_to_storage(self,image_file, folder_name, user_uid):
+        """
+        Uploads an image to Firebase Storage in a specified folder and returns its public URL.
+        :param image_file: File object representing the image to upload.
+        :param folder_name: Name of the folder in Firebase Storage where the image will be saved.
+        :param user_uid: User ID to uniquely identify the user folder.
+        :return: Public URL of the uploaded image.
+        """
+        try:
+            # Save the image file temporarily
+            temp_dir = "/tmp"
+            if not os.path.exists(temp_dir):
+                os.makedirs(temp_dir)
+
+            # Secure filename and define temporary path
+            filename = secure_filename(image_file.filename)
+            temp_path = os.path.join(temp_dir, filename)
+            image_file.save(temp_path)
+
+            # Define storage path in the bucket
+            bucket = StorageBucketSingleton().storage_bucket
+            blob = bucket.blob(f'{folder_name}/{user_uid}/{filename}')
+
+            # Upload file to Firebase Storage
+            blob.upload_from_filename(temp_path)
+
+            # Remove the temporary file
+            os.remove(temp_path)
+
+            # Make the file publicly accessible
+            blob.make_public()
+            return blob.public_url
+
+        except Exception as e:
+            print(f'Error uploading image: {str(e)}')
+            return None
+
+
     def create_user(self, image_file):
         try:
+            #Firestore instance
             db_instance = FirestoreSingleton().client
+
+            # 1) Create user in Authentication
             user_record = auth.create_user(
                 email=self.user.email,
                 email_verified=False,
@@ -18,6 +65,12 @@ class UserService:
                 display_name=self.user.first_name,
                 disabled=False
             )
+            if image_file:
+            # 2) Upload profile picture to Storage
+                image_url = self.upload_image(image_file, user_record.uid)
+                print(f'Profile image URL: {image_url}')
+            else:
+                image_url = None
 
             user_data = {
                 'uid': user_record.uid,
@@ -27,9 +80,10 @@ class UserService:
                 'display_name': self.user.first_name,
                 'control_number': self.user.control_number,
                 'email': self.user.email,
-                'image_path': f'user_profile/{user_record.uid}/{image_file.filename}',
+                'image_path': image_url,
                 'created_at': CurrentTimestamp.get_current_timestamp()
             }
+            # 3) Upload user data to Firestore
             db_instance.collection('users').document(user_record.uid).set(user_data)
             return True
         except Exception as e:
@@ -39,27 +93,40 @@ class UserService:
     def upload_image(self, image_file, user_uid: str):
         try:
             import os
+            # Define temporary directory and create if it doesn't exist
             temp_dir = "/tmp"
             if not os.path.exists(temp_dir):
                 os.makedirs(temp_dir)
 
+            # Save image temporarily
             temp_path = os.path.join(temp_dir, image_file.filename)
             image_file.save(temp_path)
 
+            # Define the Firebase Storage path for the new image
             bucket = StorageBucketSingleton().storage_bucket
-            blob = bucket.blob(f'user_profile/{user_uid}/{image_file.filename}')
+            blob_path = f'user_profile_pictures/{user_uid}/{image_file.filename}'
+            blob = bucket.blob(blob_path)
 
+            # Check and delete existing images in user's profile picture folder
+            existing_blobs = bucket.list_blobs(prefix=f'user_profile_pictures/{user_uid}/')
+            for existing_blob in existing_blobs:
+                existing_blob.delete()
+
+            # Upload new image to Firebase Storage
             blob.upload_from_filename(temp_path)
 
+            # Remove the temporary file
             os.remove(temp_path)
 
+            # Make the file publicly accessible
             blob.make_public()
+
+            # Return the public URL
             return blob.public_url
 
         except Exception as e:
             print(f'Error uploading image: {str(e)}')
             return None
-
 
     def delete_user(self, uid: str):
         try:
