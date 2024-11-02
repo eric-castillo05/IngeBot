@@ -145,7 +145,7 @@ class UserService:
             return False, f"Error updating user: {str(e)}"
 
 
-    def get_user(self, uid: str):
+    def get_user_data(self, uid: str):
         try:
             db_instance = FirestoreSingleton().client
             user_doc = db_instance.collection('users').document(uid).get()
@@ -168,4 +168,41 @@ class UserService:
             return user_data, "Usuario encontrado exitosamente"
         except Exception as e:
             print(f'Error obteniendo usuario: {str(e)}')
+
+
             return None, str(e)
+
+
+
+    def get_user_doc(self, uid):
+        db_instance = FirestoreSingleton().client
+        document_ref = db_instance.collection('users').document(uid)
+
+        data = self._fetch_document_with_subcollections(document_ref)
+        return data
+
+
+    def _fetch_document_with_subcollections(self,document_ref):
+        """
+        Fetch the document and recursively fetch subcollections.
+        """
+        data = {}
+
+        # Get the document data
+        document_data = document_ref.get().to_dict()
+
+        # Add the document data to the result
+        if document_data:
+            data['data'] = document_data
+
+        # Get subcollections
+        subcollections = document_ref.collections()
+
+        for subcollection in subcollections:
+            subcollection_data = []
+            for doc in subcollection.stream():
+                # Use the document reference to fetch its data
+                subcollection_data.append(self._fetch_document_with_subcollections(doc.reference))
+            data[subcollection.id] = subcollection_data
+
+        return data

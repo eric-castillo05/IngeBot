@@ -1,10 +1,9 @@
-from firebase_admin import auth
+
 from flask import Blueprint, request, jsonify
 from flaskr.models import User
-from flaskr.services import user_service
-from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
+
 from flaskr.services.user_service import UserService
-from flaskr.utils import CurrentTimestamp
+
 
 user_bp = Blueprint('user', __name__)
 
@@ -100,8 +99,12 @@ def update_user(uid):
 
 
 
+
+
+# -------------------GET METHODS -------------------
+#The route '/users/<uid> ONLY returns user's personal information in a json format
 @user_bp.route('/users/<uid>', methods=['GET'])
-def get_user(uid):
+def get_user_personal_data(uid):
     try:
         user_service = UserService(None)
         user_data, message = user_service.get_user(uid)
@@ -115,3 +118,21 @@ def get_user(uid):
 
     except Exception as e:
         return jsonify({'message': f'Error obteniendo usuario: {str(e)}'}), 500
+
+"""
+This route '/users/<uid>/doc' will return a json that contains users's personal information, as well as
+the information within its subcollections Tasks/Subtasks
+"""
+@user_bp.route('/users/<uid>/doc', methods=['GET'])
+def get_user_doc(uid):
+    try:
+        user_service = UserService(None)
+        user_doc = user_service.get_user_doc(uid=uid)
+        if user_doc:
+            return jsonify(user_doc), 200
+        else:
+            return jsonify({"message": "User not found"}), 404
+
+    except Exception as e:
+        print(f"Error retrieving user: {str(e)}")
+        return jsonify({"message": f"Error retrieving User info: {str(e)}"}), 500
