@@ -81,7 +81,7 @@ def update_profile_picture(user_uid):
 
 
 
-@user_bp.route('/users/<uid>', methods=['DELETE'])
+@user_bp.route('/users/delete/<uid>', methods=['DELETE'])
 def delete_user(uid):
     try:
         user_service = UserService(None)
@@ -95,7 +95,7 @@ def delete_user(uid):
         return jsonify({'message': f'Error eliminando usuario: {str(e)}'}), 500
 
 
-@user_bp.route('/users/<uid>', methods=['PUT'])
+@user_bp.route('/users/update_data<uid>', methods=['PUT'])
 def update_user(uid):
     try:
         if not request.form and 'image' not in request.files:
@@ -165,3 +165,39 @@ def get_user_doc(uid):
     except Exception as e:
         print(f"Error retrieving user: {str(e)}")
         return jsonify({"message": f"Error retrieving User info: {str(e)}"}), 500
+
+
+
+
+@user_bp.route('/users/signin', methods=['POST'])
+def sign_in():
+    try:
+        data = request.get_json()  # Get JSON data from the request
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            return jsonify({"message": "Email and password are required"}), 400
+
+        # Call the sign-in function
+        u=UserService(None)
+        response = u.sign_in_with_email_and_password(email, password)
+
+        # Check if there is an error in the response
+        if "error" in response:
+            return jsonify({"message": response["error"]["message"]}), 400
+
+        # Here, ensure that only relevant information is returned
+        user_info = {
+            "idToken": response.get("idToken"),
+            "refreshToken": response.get("refreshToken"),
+            "expiresIn": response.get("expiresIn"),
+            "localId": response.get("localId"),
+            "email": email  # You might want to return more user details if needed
+        }
+
+        return jsonify(user_info), 200  # Return only relevant information
+
+    except Exception as e:
+        print(f"Error in sign_in: {str(e)}")
+        return jsonify({"message": f"Error signing in: {str(e)}"}), 500

@@ -4,7 +4,7 @@ from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 from flaskr.services.singletons.StorageBucketSingleton import StorageBucketSingleton
 from flaskr.utils.current_timestamp import CurrentTimestamp
 
-
+import json,requests
 
 from werkzeug.utils import secure_filename
 import os
@@ -272,4 +272,26 @@ class UserService:
                 subcollection_data.append(self._fetch_document_with_subcollections(doc.reference))
             data[subcollection.id] = subcollection_data
 
+
         return data
+
+
+
+    # EACH TOKEN EXPIRES IN 1 HR
+    def sign_in_with_email_and_password(self,email, password, return_secure_token=True):
+        payload = json.dumps({
+            "email": email,
+            "password": password,
+            "returnSecureToken": return_secure_token
+        })
+
+        rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
+
+        response = requests.post(
+            rest_api_url,
+            params={"key": "AIzaSyAvYDnOq974Yudogmsixdt8qw2D92mJcug"},
+            data=payload,
+            headers={"Content-Type": "application/json"}
+        )
+
+        return response.json()
