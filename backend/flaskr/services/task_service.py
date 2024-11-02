@@ -1,5 +1,3 @@
-from tkinter.constants import SEL_FIRST
-
 from flaskr.models import Task, Subtask
 from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 from flaskr.utils import CurrentTimestamp

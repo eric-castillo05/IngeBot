@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flaskr.models import User
 from flaskr.services.user_service import UserService
+from firebase_admin import auth
 
 user_bp = Blueprint('user', __name__)
 

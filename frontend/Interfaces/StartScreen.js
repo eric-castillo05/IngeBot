@@ -1,8 +1,10 @@
-import React from 'react';
+import * as React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 const StartScreen = ({ navigation }) => {
+
     return (
+
         <View style={styles.container}>
             <Image
                 source={require('../assets/Logo.png')}
@@ -50,7 +52,7 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         paddingHorizontal: 180,
         borderRadius: 20,
-        marginTop: 100,
+        marginTop: 50,
     },
     buttonText: {
         fontSize: 18,

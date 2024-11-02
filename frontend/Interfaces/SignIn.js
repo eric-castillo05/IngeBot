@@ -1,18 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, Keyboard, TextInput, TouchableOpacity, StatusBar, TouchableWithoutFeedback, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Keyboard, TextInput, TouchableOpacity, StatusBar, TouchableWithoutFeedback, Alert } from 'react-native';
 import axios from 'axios';
 import { CommonActions } from '@react-navigation/native';
 import {Ionicons} from "@expo/vector-icons";
 import { useState } from 'react';
 
 const SignIn = ({navigation}) => {
-    const [NumCtl, setNum] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
-    const [password, setPassword] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
+    const [control_number, setControl_Number] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleSignIn = async () => {
         try {
-            let response = await axios.post('http://', {
-                NumCtl: NumCtl,  // Cambiar por el nombre de la variable que se usará en el backend
+            let response = await axios.post('http://192.168.0.106:5000/users/login', {
+                control_number: setControl_Number,  // Cambiar por el nombre de la variable que se usará en el backend
                 password: password, // Cambiar por el nombre de la variable que se usará en el backend
             });
             if (response.status === 200) {
@@ -33,9 +33,17 @@ const SignIn = ({navigation}) => {
             }
         }
     };
+    const generateEmail = (controlNumber) => {
+        return `L${controlNumber}@zacatepec.tecnm.mx`;
+    };
+
+    const handleControlNumberChange = (value) => {
+        setControl_Number(value);
+    };
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
             <View style={styles.container}>
                 <View style={styles.circleBottomL}></View>
                 <View style={styles.circleBottomR}></View>
@@ -56,14 +64,13 @@ const SignIn = ({navigation}) => {
                 <View style={styles.iconContainer}>
                     <Text style={styles.icon}>👤</Text>
                 </View>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Num de Control"
-                    placeholderTextColor="#8c8c8c"
-                    value={NumCtl}
-                    onChangeText={setNum}
-                    keyboardType={"email-address"}
-                />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Número de Control"
+                        placeholderTextColor="#8c8c8c"
+                        value={control_number}
+                        onChangeText={setControl_Number}
+                    />
                 <TextInput
                     style={styles.input}
                     placeholder="Password"
@@ -79,6 +86,7 @@ const SignIn = ({navigation}) => {
                     <Text style={styles.buttonText}>SIGN-IN</Text>
                 </TouchableOpacity>
             </View>
+            </ScrollView>
         </TouchableWithoutFeedback>
     );
 };
