@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flaskr.models import Task, Subtask
-from flaskr.services.task_service import TaskService, SubtaskService
+from flaskr.services.task_service import TaskService
 from flaskr.utils import CurrentTimestamp
 
 task_bp = Blueprint('task', __name__)
@@ -38,37 +38,73 @@ def create_task():
         print(f"Error in create_task: {str(e)}")
         return jsonify({'message': 'An error occurred creating the task.'}), 500
 
-
-@task_bp.route('/tasks/create_subtask', methods=['POST'])
-def create_subtask():
+@task_bp.route('/tasks/update', methods=['PUT'])
+def update_task():
     try:
-        # Check for JSON data
-        if not request.json:
-            return jsonify({'message': 'No JSON data provided'}), 400
-
         data = request.json
+        uid = data.get('uid')
+        task_id = data.get('task_id')
+        title = data.get('title')
+        description = data.get('description')
+        due_date = data.get('due_date')
+        priority = data.get('priority')
 
-        # Validate required fields
-        required_fields = ['title', 'description', 'uid', 'task_id']
-        missing_fields = [field for field in required_fields if not data.get(field)]
-        if missing_fields:
-            return jsonify({'message': 'Missing required fields', 'missing_fields': missing_fields}), 400
+        if not uid or not task_id or not title or not description or not due_date or not priority:
+            return jsonify({'message': 'Missing required fields'}), 400
 
-        # Create Subtask object
-        subtask = Subtask(
-            title=data['title'],
-            description=data['description']
-        )
+        task = Task(title=title, description=description, priority=priority, due_date=due_date)
+        task_service = TaskService(task)
 
-        # Initialize SubtaskService
-        subtask_service = SubtaskService(subtask)
-
-        # Use SubtaskService to create subtask in Firestore
-        if subtask_service.create_subtask(data['uid'], data['task_id']):  # Pass uid and task_id
-            return jsonify({'message': 'Subtask created successfully.'}), 201
+        if task_service.update_task(uid, task_id):
+            return jsonify({'message': 'Task updated successfully.'}), 200
         else:
-            return jsonify({'message': 'Subtask could not be created.'}), 400
+            return jsonify({'message': 'Failed to update task.'}), 400
 
     except Exception as e:
-        print(f"Error in create_subtask: {str(e)}")
-        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+        print(f"Error in update_task: {str(e)}")
+        return jsonify({'message': 'An error occurred while updating the task.'}), 500
+
+
+@task_bp.route('/tasks/delete', methods=['DELETE'])
+def delete_task():
+    try:
+        data = request.json
+        uid = data.get('uid')
+        task_id = data.get('task_id')
+
+        if not uid or not task_id:
+            return jsonify({'message': 'Missing required fields'}), 400
+
+        task_service = TaskService(None)
+        if task_service.delete_task(uid, task_id):
+            return jsonify({'message': 'Task deleted successfully.'}), 200
+        else:
+            return jsonify({'message': 'Failed to delete task.'}), 400
+
+    except Exception as e:
+        print(f"Error in delete_task: {str(e)}")
+        return jsonify({'message': 'An error occurred while deleting the task.'}), 500
+
+
+
+# This returns its data but does not return the "subtasks" subcollection
+@task_bp.route('/tasks/get', methods=['GET'])
+def get_task_data():
+    try:
+        data = request.form
+        uid = data.get('uid')
+        task_id = data.get('task_id')
+
+        task = TaskService.get_task_data(uid=uid, task_id=task_id)
+        if task:
+            return jsonify(task), 200
+        else:
+            return jsonify({"message": "Task not found"}), 404
+
+    except Exception as e:
+        print(f"Error retrieving task: {str(e)}")
+        return jsonify({"message": f"Error retrieving task: {str(e)}"}), 500
+
+
+
+
