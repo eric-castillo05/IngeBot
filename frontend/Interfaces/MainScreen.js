@@ -160,6 +160,7 @@ const TaskManagementScreen = ({navigation}) => {
                         onChangeText={(text) => setNewTask({ ...newTask, description: text })}
                         style={styles.input}
                     />
+
                     <TouchableOpacity onPress={addTask} style={styles.addButton}>
                         <Text style={styles.addButtonText}>Agregar Tarea</Text>
                     </TouchableOpacity>
