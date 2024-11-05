@@ -1,84 +1,93 @@
 import React from 'react';
-import { View, Text, StyleSheet, Keyboard, TextInput, TouchableOpacity, StatusBar, TouchableWithoutFeedback, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Keyboard, TextInput, TouchableOpacity, StatusBar, TouchableWithoutFeedback, Alert } from 'react-native';
 import axios from 'axios';
 import { CommonActions } from '@react-navigation/native';
 import {Ionicons} from "@expo/vector-icons";
 import { useState } from 'react';
 
-const SignIn = ({navigation}) => {
-    const [NumCtl, setNum] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
-    const [password, setPassword] = useState(''); // Cambiar por el nombre de la variable que se usará en el backend
+const SignIn = ({ navigation }) => {
+    const [controlNumber, setControlNumber] = useState(''); // Almacena el número de control
+    const [password, setPassword] = useState('');
+
+    // Genera el correo electrónico a partir del número de control
+    const generateEmail = (controlNumber) => {
+        return `L${controlNumber}@zacatepec.tecnm.mx`;
+    };
 
     const handleSignIn = async () => {
         try {
-            let response = await axios.post('http://', {
-                NumCtl: NumCtl,  // Cambiar por el nombre de la variable que se usará en el backend
-                password: password, // Cambiar por el nombre de la variable que se usará en el backend
+            // Genera el email antes de enviar la solicitud
+            const email = generateEmail(controlNumber);
+
+            let response = await axios.post('http://192.168.0.106:5000/users/signin', {
+                email: email,    // Enviamos el email generado
+                password: password,
             });
             if (response.status === 200) {
                 Alert.alert('Login exitoso');
                 navigation.dispatch(
                     CommonActions.reset({
                         index: 0,
-                        routes: [{name: 'Main'}],
+                        routes: [{ name: 'Main' }],
                     })
                 );
                 return;
             }
         } catch (error) {
-            if (error.response.status === 401) {
+            if (error.response && error.response.status === 401) {
                 Alert.alert('Número de control o contraseña incorrectos');
             } else {
-                Alert.alert('Error inesperado');
+                Alert.alert('Error 401');
             }
         }
     };
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={styles.container}>
-                <View style={styles.circleBottomL}></View>
-                <View style={styles.circleBottomR}></View>
-                <View style={styles.circleTopR}></View>
-                <View style={styles.circleTopRR}></View>
-                <View style={styles.circleBottomRR}></View>
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={styles.container}>
+                    <View style={styles.circleBottomL}></View>
+                    <View style={styles.circleBottomR}></View>
+                    <View style={styles.circleTopR}></View>
+                    <View style={styles.circleTopRR}></View>
+                    <View style={styles.circleBottomRR}></View>
 
-                <Ionicons
-                    name="arrow-back"
-                    size={30}
-                    color="black"
-                    style={styles.backIcon}
-                    onPress={() => navigation.goBack()}
-                />
-                <StatusBar barStyle="dark-content" />
-                <Text style={styles.title}>Sign In</Text>
-                <Text style={styles.subtitle}>Bienvenido de vuelta</Text>
-                <View style={styles.iconContainer}>
-                    <Text style={styles.icon}>👤</Text>
+                    <Ionicons
+                        name="arrow-back"
+                        size={30}
+                        color="black"
+                        style={styles.backIcon}
+                        onPress={() => navigation.goBack()}
+                    />
+                    <StatusBar barStyle="dark-content" />
+                    <Text style={styles.title}>Sign In</Text>
+                    <Text style={styles.subtitle}>Bienvenido de vuelta</Text>
+                    <View style={styles.iconContainer}>
+                        <Text style={styles.icon}>👤</Text>
+                    </View>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Número de Control"
+                        placeholderTextColor="#8c8c8c"
+                        value={controlNumber}
+                        onChangeText={setControlNumber}  // Actualiza el número de control
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Password"
+                        placeholderTextColor="#8c8c8c"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry
+                    />
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={handleSignIn}
+                    >
+                        <Text style={styles.buttonText}>SIGN-IN</Text>
+                    </TouchableOpacity>
                 </View>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Num de Control"
-                    placeholderTextColor="#8c8c8c"
-                    value={NumCtl}
-                    onChangeText={setNum}
-                    keyboardType={"email-address"}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor="#8c8c8c"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                />
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={handleSignIn} // Cambiar por el nombre de la función
-                >
-                    <Text style={styles.buttonText}>SIGN-IN</Text>
-                </TouchableOpacity>
-            </View>
+            </ScrollView>
         </TouchableWithoutFeedback>
     );
 };

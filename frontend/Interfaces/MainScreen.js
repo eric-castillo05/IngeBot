@@ -1,21 +1,26 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, Animated, TouchableWithoutFeedback, StyleSheet, Dimensions, FlatList, Modal, TextInput, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import NuevaTareaScreen from "./NuevaTareaScreen";
+import MotivacionBar from "./MotivacionBar";
 
 const { width, height } = Dimensions.get('window');
 
 const TaskManagementScreen = ({navigation}) => {
     const [tasks, setTasks] = useState([
-        { id: '1', category: 'Hoy', title: 'Tarea 1', description: 'Ecuaciones Diferenciales - Ecuaciones Exactas', status: '1 de 4', color: '#A8E6CF' },
-        { id: '2', category: 'Hoy', title: 'Tarea 2', description: 'Administración de Base de Datos - Comandos', status: '1 de 4', color: '#FF8B94' },
-        { id: '3', category: 'Hoy', title: 'Tarea 3', description: 'Taller de Investigación - Documentación', status: '1 de 4', color: '#FFD3B6' },
-        { id: '4', category: 'Mañana', title: 'Tarea 4', description: 'Lorem ipsum dolor sit amet', status: '1 de 4', color: '#AECBFA' },
+        { id: '1', category: 'Hoy', title: 'Tarea 1', description: 'Ecuaciones Diferenciales - Ecuaciones Exactas', status: '1 de 4', color: '#A8E6CF', progress: 25},
+        { id: '2', category: 'Hoy', title: 'Tarea 2', description: 'Administración de Base de Datos - Comandos', status: '1 de 4', color: '#FF8B94', progress: 25 },
+        { id: '3', category: 'Hoy', title: 'Tarea 3', description: 'Taller de Investigación - Documentación', status: '1 de 4', color: '#FFD3B6' , progress: 25},
+        { id: '4', category: 'Mañana', title: 'Tarea 4', description: 'Lorem ipsum dolor sit amet', status: '1 de 4', color: '#AECBFA' , progress: 25},
     ]);
     const [isSidebarVisible, setSidebarVisible] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
     const [newTask, setNewTask] = useState({ title: '', description: '', color: '#A8E6CF' });
 
     const slideAnim = useRef(new Animated.Value(-width)).current;
+
+
 
     const toggleSidebar = () => {
         if (isSidebarVisible) {
@@ -53,12 +58,13 @@ const TaskManagementScreen = ({navigation}) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <MotivacionBar />
             <View style={styles.header}>
                 <TouchableOpacity onPress={toggleSidebar}>
                     <Ionicons name="menu" size={width * 0.06} color="black" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Gestión de tareas</Text>
-                <TouchableOpacity onPress={toggleModal}>
+                <TouchableOpacity onPress={() => navigation.navigate('NuevaTarea')}>
                     <Ionicons name="add-circle" size={width * 0.06} color="black" />
                 </TouchableOpacity>
             </View>
@@ -74,7 +80,7 @@ const TaskManagementScreen = ({navigation}) => {
             <Animated.View style={[styles.sidebar, { transform: [{ translateX: slideAnim }] }]}>
                 <View style={styles.profileContainer}>
                     <Image
-                        source={{ uri: 'https://your-image-url.com' }} // Reemplaza con la URL de tu imagen
+                        source={{ uri: 'https://your-image-url.com' }}
                         style={styles.profileImage}
                     />
                     <Text style={styles.profileName}>Lionel Andrés</Text>
@@ -107,7 +113,17 @@ const TaskManagementScreen = ({navigation}) => {
                 renderItem={({ item }) => (
                     <View style={[styles.taskContainer, { backgroundColor: item.color }]}>
                         <View style={styles.statusContainer}>
-                            <Text style={styles.statusText}>{`Status\n${item.status}`}</Text>
+                            <AnimatedCircularProgress
+                                size={50}
+                                width={5}
+                                fill={item.progress}
+                                tintColor="#00e0ff"
+                                backgroundColor="#3d5875"
+                            >
+                                {() => (
+                                    <Text style={styles.statusText}>{`${item.status}`}</Text>
+                                )}
+                            </AnimatedCircularProgress>
                         </View>
                         <View style={styles.taskInfo}>
                             <Text style={styles.taskTitle}>{item.title}</Text>
@@ -127,7 +143,17 @@ const TaskManagementScreen = ({navigation}) => {
                 renderItem={({ item }) => (
                     <View style={[styles.taskContainer, { backgroundColor: item.color }]}>
                         <View style={styles.statusContainer}>
-                            <Text style={styles.statusText}>{`Status\n${item.status}`}</Text>
+                            <AnimatedCircularProgress
+                                size={50}
+                                width={5}
+                                fill={item.progress}
+                                tintColor="#00e0ff"
+                                backgroundColor="#3d5875"
+                            >
+                                {() => (
+                                    <Text style={styles.statusText}>{`${item.status}`}</Text>
+                                )}
+                            </AnimatedCircularProgress>
                         </View>
                         <View style={styles.taskInfo}>
                             <Text style={styles.taskTitle}>{item.title}</Text>
@@ -145,30 +171,6 @@ const TaskManagementScreen = ({navigation}) => {
             <Ionicons name="chatbubble-ellipses" size={24} color="white" />
         </TouchableOpacity>
 
-            {/* Modal para agregar tareas */}
-            <Modal visible={isModalVisible} animationType="slide">
-                <View style={styles.modalContainer}>
-                    <TextInput
-                        placeholder="Título de la tarea"
-                        value={newTask.title}
-                        onChangeText={(text) => setNewTask({ ...newTask, title: text })}
-                        style={styles.input}
-                    />
-                    <TextInput
-                        placeholder="Descripción de la tarea"
-                        value={newTask.description}
-                        onChangeText={(text) => setNewTask({ ...newTask, description: text })}
-                        style={styles.input}
-                    />
-
-                    <TouchableOpacity onPress={addTask} style={styles.addButton}>
-                        <Text style={styles.addButtonText}>Agregar Tarea</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={toggleModal} style={styles.cancelButton}>
-                        <Text style={styles.cancelButtonText}>Cancelar</Text>
-                    </TouchableOpacity>
-                </View>
-            </Modal>
         </SafeAreaView>
     );
 };

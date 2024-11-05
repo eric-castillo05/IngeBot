@@ -1,21 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const EmpecemosScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
-
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.circleTop}></View>
             <View style={styles.circleBottom}></View>
 
-            <Ionicons
+                {/*<Ionicons
                 name="arrow-back"
                 size={30}
                 color="black"
                 style={styles.backIcon}
                 onPress={() => navigation.goBack()}
             />
+            */}
 
             <Text style={styles.title}>Empecemos</Text>
             <Text style={styles.subtitle}>Empieza por hacer Sign-In o Sign-Up</Text>
@@ -32,15 +33,20 @@ const EmpecemosScreen = ({ navigation }) => {
             <TouchableOpacity style={[styles.button, styles.signInButton]} onPress={() => navigation.navigate('SignIn')}>
                 <Text style={styles.buttonText}>SIGN-IN</Text>
             </TouchableOpacity>
+            </ScrollView>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+    },
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        padding: 20,
+        paddingHorizontal: 10,
     },
     backIcon: {
         position: 'absolute',
@@ -51,8 +57,8 @@ const styles = StyleSheet.create({
         fontSize: 52,
         fontWeight: 'bold',
         color: '#000',
-        marginTop: 150,
-        textAlign: 'left',
+        marginTop: 50,
+        textAlign: "left",
     },
     subtitle: {
         fontSize: 16,
@@ -89,7 +95,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: 400,
         height: 400,
-        borderRadius: 200,
+        borderRadius: 300,
         backgroundColor: '#002540',
         bottom: -100,
         left: -100,
