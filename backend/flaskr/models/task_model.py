@@ -1,5 +1,4 @@
 from typing import List
-
 from flaskr.models import Subtask
 from flaskr.utils import DateFormater
 

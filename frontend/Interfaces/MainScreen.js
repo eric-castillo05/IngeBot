@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, Animated, TouchableWithoutFeedback
 import { Ionicons } from '@expo/vector-icons';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import NuevaTareaScreen from "./NuevaTareaScreen";
+import MotivacionBar from "./MotivacionBar";
 
 const { width, height } = Dimensions.get('window');
 
@@ -18,6 +19,8 @@ const TaskManagementScreen = ({navigation}) => {
     const [newTask, setNewTask] = useState({ title: '', description: '', color: '#A8E6CF' });
 
     const slideAnim = useRef(new Animated.Value(-width)).current;
+
+
 
     const toggleSidebar = () => {
         if (isSidebarVisible) {
@@ -55,6 +58,7 @@ const TaskManagementScreen = ({navigation}) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <MotivacionBar />
             <View style={styles.header}>
                 <TouchableOpacity onPress={toggleSidebar}>
                     <Ionicons name="menu" size={width * 0.06} color="black" />

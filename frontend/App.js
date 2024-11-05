@@ -8,6 +8,7 @@ import SignUp from "./Interfaces/SignUp";
 import MainScreen from "./Interfaces/MainScreen";
 import ChatBotScreen from "./Interfaces/ChatBotScreen";
 import NuevaTareaScreen from "./Interfaces/NuevaTareaScreen";
+import MotivacionBar from "./Interfaces/MotivacionBar";
 
 const Stack = createStackNavigator();
 
@@ -26,7 +27,7 @@ export default function App() {
                 <Stack.Screen name="Main" component={MainScreen} />
                 <Stack.Screen name="ChatBot" component={ChatBotScreen} />
                 <Stack.Screen name="NuevaTarea" component={NuevaTareaScreen} />
-
+                <Stack.Screen name="MotivacionBar" component={MotivacionBar} />
             </Stack.Navigator>
         </NavigationContainer>
     );

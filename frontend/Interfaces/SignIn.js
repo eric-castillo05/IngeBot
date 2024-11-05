@@ -37,7 +37,7 @@ const SignIn = ({ navigation }) => {
             if (error.response && error.response.status === 401) {
                 Alert.alert('Número de control o contraseña incorrectos');
             } else {
-                Alert.alert('Error inesperado');
+                Alert.alert('Error 401');
             }
         }
     };
