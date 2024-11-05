@@ -17,7 +17,7 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(task_bp)
     app.register_blueprint(subtask_bp)
-    app.register_blueprint(motivational_bp, url_prefix='/api')
+    app.register_blueprint(motivational_bp)
 
     # Configuración de Firestore
     try:
