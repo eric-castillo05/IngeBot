@@ -19,7 +19,7 @@ const SignIn = ({ navigation }) => {
             // Genera el email antes de enviar la solicitud
             const email = generateEmail(controlNumber);
 
-            let response = await axios.post('http://192.168.0.106:5000/users/signin', {
+            let response = await axios.post('http://10.177.59.49:5000/users/signin', {
                 email: email,    // Enviamos el email generado
                 password: password,
             });

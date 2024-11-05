@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, Image, TouchableOpacity, Animated, TouchableWithoutFeedback, StyleSheet, Dimensions, FlatList, Modal, TextInput, SafeAreaView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Animated, TouchableWithoutFeedback, StyleSheet, Dimensions, FlatList, Modal, TextInput, SafeAreaView, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import NuevaTareaScreen from "./NuevaTareaScreen";
 import MotivacionBar from "./MotivacionBar";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -20,6 +21,29 @@ const TaskManagementScreen = ({navigation}) => {
 
     const slideAnim = useRef(new Animated.Value(-width)).current;
 
+    const handleSignOut = async () => {
+        Alert.alert(
+            'Cerrar sesión',
+            '¿Estás seguro de que quieres cerrar sesión?',
+            [
+                {
+                    text: 'Cancelar',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Aceptar',
+                    onPress: async () => {
+                        try {
+                            await AsyncStorage.removeItem('userToken');
+                            navigation.navigate('SignIn');
+                        } catch (error) {
+                            Alert.alert('Error', 'No se pudo cerrar sesión');
+                        }
+                    },
+                },
+            ]
+        );
+    };
 
 
     const toggleSidebar = () => {
@@ -99,7 +123,7 @@ const TaskManagementScreen = ({navigation}) => {
                     <Ionicons name="information-circle-outline" size={24} color="black" />
                     <Text style={styles.drawerText}>Conócenos</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.drawerItem}>
+                <TouchableOpacity style={styles.drawerItem} onPress={handleSignOut}>
                     <Ionicons name="log-out-outline" size={24} color="red" />
                     <Text style={[styles.drawerText, { color: 'red' }]}>Cerrar sesión</Text>
                 </TouchableOpacity>

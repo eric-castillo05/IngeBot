@@ -5,11 +5,13 @@ class MotivationalService:
         pass
 
     def get_phrase(self):
-        url = 'https://frasedeldia.azurewebsites.net/api/phrase'
+        url = 'http://localhost:5000/motivational-message'
         try:
             response = requests.get(url)
             if response.status_code == 200:
-                return response.text
+                # Parsear el JSON y obtener el mensaje
+                data = response.json()
+                return data.get("message", "Mensaje no disponible")
             else:
                 return 'Error al obtener la frase'
         except requests.RequestException as e:
