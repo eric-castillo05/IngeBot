@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 const { width } = Dimensions.get('window');
 
 const MotivationalBar = () => {
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState(''); // Cambia temporalmente a un mensaje fijo para depurar
     const [isVisible, setIsVisible] = useState(false);
     const slideAnim = useRef(new Animated.Value(-width)).current;
 
@@ -12,6 +12,7 @@ const MotivationalBar = () => {
         try {
             const response = await fetch('http://192.168.0.106:5000/motivational-message');
             const data = await response.json();
+            console.log("Mensaje recibido:", data.message); // Depuración
             setMessage(data.message);
 
             setIsVisible(true);
@@ -40,7 +41,7 @@ const MotivationalBar = () => {
 
     return isVisible ? (
         <Animated.View style={[styles.notificationBar, { transform: [{ translateX: slideAnim }] }]}>
-            <Text style={styles.notificationText}>{message}</Text>
+            <Text style={styles.notificationText}>{message || "Mensaje predeterminado"}</Text>
         </Animated.View>
     ) : null;
 };

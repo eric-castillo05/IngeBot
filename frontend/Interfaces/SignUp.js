@@ -1,5 +1,5 @@
-    import React, { useState } from 'react';
-    import { View, Text, StyleSheet, TextInput,ScrollView, TouchableOpacity,TouchableWithoutFeedback, StatusBar,Keyboard ,Alert } from 'react-native';
+    import { useState } from 'react';
+    import { View, Text, StyleSheet, TextInput,ScrollView, TouchableOpacity,TouchableWithoutFeedback, StatusBar,Keyboard ,Alert, Image } from 'react-native';
     import {Ionicons} from "@expo/vector-icons";
     import * as ImagePicker from 'expo-image-picker';
 
@@ -66,7 +66,7 @@
             });
 
             if (!result.cancelled) {
-                setImage(result);
+                setImage(result.assets[0]); // Selecciona la primera imagen de los resultados, si usa `assets`
             }
         };
         const generateEmail = (controlNumber) => {
@@ -165,15 +165,16 @@
                                 secureTextEntry
                             />
                         </View>
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.icon}>📷</Text>
-                            <TextInput
-                                style={styles.input}
-                                onPress={pickImage}
-                                placeholder="Selecciona una imagen"
-                            >
-                            </TextInput>
-                        </View>
+                        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+                            <Text style={styles.imageButtonText}>📷 Seleccionar Imagen</Text>
+                        </TouchableOpacity>
+
+                        {image && (
+                            <Image
+                                source={{ uri: image.uri }}
+                                style={{ width: 200, height: 200, borderRadius: 10, marginBottom: 20, alignSelf: 'center' , marginTop: 20}}
+                            />
+                        )}
 
                         <TouchableOpacity
                             style={styles.button}
@@ -252,6 +253,18 @@
         buttonText: {
             color: '#090909',
             fontSize: 18,
+            fontWeight: 'bold',
+        },
+        imageButton: {
+            backgroundColor: '#DFDFDF',
+            borderRadius: 25,
+            paddingVertical: 15,
+            alignItems: 'center',
+            marginTop: 20,
+        },
+        imageButtonText: {
+            color: '#002540',
+            fontSize: 16,
             fontWeight: 'bold',
         },
         circleBottomL: {
