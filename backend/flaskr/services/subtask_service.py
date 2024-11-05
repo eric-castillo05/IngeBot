@@ -66,6 +66,30 @@ class SubtaskService:
             print(f'Error retrieving subtask: {str(e)}')
             return None
 
+    @staticmethod
+    def fetch_subtasks(uid, task_id):
+        """
+        Fetch all subtasks for a given user and task, and return the data as a dictionary.
+        """
+        subtasks_data = []
+        # db instance
+        db_instance = FirestoreSingleton().client
+        # Reference to the subtasks collection
+        subtasks_ref = db_instance.collection("users").document(uid).collection("Tasks").document(task_id).collection(
+            "Subtasks")
+
+        # Stream through all subtasks
+        subtasks = subtasks_ref.stream()
+
+        for subtask in subtasks:
+            # Append each subtask's data to the list
+            subtasks_data.append({
+
+                "data": subtask.to_dict()
+            })
+
+        return subtasks_data
+
 
 
 

@@ -56,6 +56,11 @@ class TaskService:
         except Exception as e:
             print(f'Error deleting task: {str(e)}')
             return False
+
+
+
+
+
     @staticmethod
     def get_task_data(uid, task_id):
 
@@ -68,4 +73,27 @@ class TaskService:
             print(f'Error retrieving task: {str(e)}')
             return None
 
+
+    @staticmethod
+    def fetch_tasks(uid):
+        """
+        Fetch all subtasks for a given user and task, and return the data as a dictionary.
+        """
+        tasks_data = []
+        # db instance
+        db_instance = FirestoreSingleton().client
+        # Reference to the subtasks collection
+        tasks_ref = db_instance.collection("users").document(uid).collection("Tasks")
+
+        # Stream through all subtasks
+        tasks = tasks_ref.stream()
+
+        for task in tasks:
+            # Append each subtask's data to the list
+            tasks_data.append({
+
+                "data": task.to_dict()
+            })
+
+        return tasks_data
 

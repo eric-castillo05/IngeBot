@@ -113,3 +113,17 @@ def get_subtask():
         print(f"Error retrieving subtask: {str(e)}")
         return jsonify({"message": f"Error retrieving subtask: {str(e)}"}), 500
 
+
+@subtask_bp.route('/subtasks/<uid>/<task_id>/get_all', methods=['GET'])
+def get_all_subtasks(uid, task_id):
+    st = SubtaskService(None)
+    try:
+        subtasks = st.fetch_subtasks(task_id=task_id, uid=uid)
+        if subtasks:
+            return jsonify(subtasks), 200
+        else:
+            return jsonify({"message": "Subtasks not found"}), 404
+
+    except Exception as e:
+        print(f"Error retrieving subtasks: {str(e)}")
+
