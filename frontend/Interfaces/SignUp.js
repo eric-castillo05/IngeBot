@@ -16,8 +16,12 @@
         const handleSignUp = async () => {
             if (password !== confirmPassword) {
                 Alert.alert('Error', 'Las contraseñas no coinciden');
-                return;
+            } else if (password.length < 6) {
+                Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
+            } else {
+                // Continue with the sign-up process
             }
+            return;
 
             const registrationData = new FormData();
             registrationData.append('first_name', name);
@@ -31,13 +35,13 @@
             if (image) {
                 registrationData.append('image', {
                     uri: image.uri,
-                    name: 'profile.jpg',
-                    type: 'image/jpeg'
+                    name: 'profile.jpg', // Cambia esto si deseas un nombre dinámico
+                    type: 'image/jpeg',  // Especifica el tipo de archivo como JPEG
                 });
             }
 
             try {
-                const response = await fetch('http://192.168.0.106:5000/users/register', {
+                const response = await fetch('http://10.177.59.49:5000/users/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -77,6 +81,7 @@
             setControl_Number(value);
             setEmail(generateEmail(value)); // Genera el correo y lo guarda por separado
         };
+        const [showPassword, setShowPassword] = useState(false);
 
         return (
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -149,9 +154,12 @@
                                 placeholderTextColor="#8c8c8c"
                                 value={password}
                                 onChangeText={setPassword}
-                                secureTextEntry
+                                secureTextEntry = {!showPassword}
                             />
-                        </View>
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                <Ionicons name={showPassword? "eye-off" : "eye"} size={24} color="black" />
+                            </TouchableOpacity>
+                            </View>
 
 
                         <View style={styles.inputContainer}>
@@ -162,7 +170,7 @@
                                 placeholderTextColor="#8c8c8c"
                                 value={confirmPassword}
                                 onChangeText={setConfirmPassword}
-                                secureTextEntry
+                                secureTextEntry={!showPassword}
                             />
                         </View>
                         <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
