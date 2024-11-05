@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-from flaskr.models import Task, Subtask
-=======
 from flaskr.models import Task
->>>>>>> feature
 from flaskr.services.singletons.FirestoreSingleton import FirestoreSingleton
 from flaskr.utils import CurrentTimestamp
 

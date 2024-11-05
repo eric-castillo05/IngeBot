@@ -19,11 +19,11 @@ export default function App() {
                     headerShown: true, // Oculta el encabezado en todas las pantallas
                 }}
             >
-                <Stack.Screen name="Main" component={MainScreen} />
                 <Stack.Screen name="Start" component={StartScreen} />
                 <Stack.Screen name="Empecemos" component={EmpecemosScreen} />
                 <Stack.Screen name="SignIn" component={SignIn} />
                 <Stack.Screen name="SignUp" component={SignUp} />
+                <Stack.Screen name="Main" component={MainScreen} />
                 <Stack.Screen name="ChatBot" component={ChatBotScreen} />
                 <Stack.Screen name="NuevaTarea" component={NuevaTareaScreen} />
 
