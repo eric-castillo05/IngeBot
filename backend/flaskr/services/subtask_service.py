@@ -17,6 +17,7 @@ class SubtaskService:
                 'subtaskTitle': self.subtask.title,
                 'description': self.subtask.description,
                 'createdAt': CurrentTimestamp.get_current_timestamp(),
+                'status': self.subtask.status,
             }
 
             # Find the task collection and subtask collection based on task_id

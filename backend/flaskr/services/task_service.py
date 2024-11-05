@@ -18,6 +18,7 @@ class TaskService:
                 'createdAt': CurrentTimestamp.get_current_timestamp(),
                 'due_date': self.task.due_date,
                 'priority': self.task.priority,
+                'progress': self.task.progress,
             }
             # Find "User" document within the "Users" collection with "uid"
             user_ref = db_instance.collection('users').document(uid)

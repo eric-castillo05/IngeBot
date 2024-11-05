@@ -13,7 +13,8 @@ class Task:
         self.title = title
         self.description = description
         self.priority = priority
-        self.due_date = DateFormater.dateFormat(due_date)
+        self.due_date = DateFormater.dateFormat(due_date),
+        self.progress = 0.0
 
 
     def to_dict(self):
