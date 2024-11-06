@@ -1,36 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TextInput, Button, Text } from 'react-native';
-import { DirectLine } from 'botframework-directlinejs';
 
-const ChatbotScreen = () => {
+const AzureChatbot = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
-    const directLine = new DirectLine({
-        secret: 'BHmYkbaAC2c.kSwdWbpySdHMRvsHGSJakyjwjD_SF4fgu-AF3wEugMw' // Reemplaza con tu clave de Direct Line
-    });
-
-    useEffect(() => {
-        const subscription = directLine.activity$
-            .subscribe(activity => {
-                if (activity.from.id !== 'user') {
-                    setMessages(prevMessages => [...prevMessages, { text: activity.text, isUser: false }]);
-                }
-            });
-
-        return () => subscription.unsubscribe(); // Limpia la suscripción
-    }, []);
 
     const sendMessage = () => {
         if (message.trim() !== '') {
+            // Send the message to the Azure bot
             setMessages([...messages, { text: message, isUser: true }]);
-            directLine.postActivity({
-                from: { id: 'user', name: 'User' },
-                type: 'message',
-                text: message
-            }).subscribe(
-                () => setMessage(''),
-                error => console.error('Error enviando mensaje:', error)
-            );
+            setMessage('');
+
+            // Display the bot's response
+            setMessages([...messages, { text: 'Bot response', isUser: false }]);
         }
     };
 
@@ -38,7 +20,13 @@ const ChatbotScreen = () => {
         <View style={styles.container}>
             <View style={styles.chatContainer}>
                 {messages.map((msg, index) => (
-                    <View key={index} style={[styles.messageContainer, msg.isUser ? styles.userMessage : styles.botMessage]}>
+                    <View
+                        key={index}
+                        style={[
+                            styles.messageContainer,
+                            msg.isUser ? styles.userMessage : styles.botMessage
+                        ]}
+                    >
                         <Text style={styles.messageText}>{msg.text}</Text>
                     </View>
                 ))}
@@ -55,6 +43,7 @@ const ChatbotScreen = () => {
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
@@ -102,4 +91,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default ChatbotScreen;
+export default AzureChatbot;
