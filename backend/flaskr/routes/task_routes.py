@@ -121,6 +121,20 @@ def get_all_tasks(uid):
 
 
 
+@task_bp.route('/tasks/<uid>/<task_id>/get', methods=['GET'])
+def get_task_with_subtasks(uid, task_id):
+    t = TaskService(None)  # Initialize your TaskService
+    try:
+        task_with_subtasks = t.fetch_task_with_subtasks(uid=uid, task_id=task_id)
+        if task_with_subtasks:
+            return jsonify(task_with_subtasks), 200
+        else:
+            return jsonify({"message": "Task not found"}), 404
+
+    except Exception as e:
+        print(f"Error retrieving task and subtasks: {str(e)}")
+        return jsonify({"message": "Internal server error"}), 500
+
 
 
 

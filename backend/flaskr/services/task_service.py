@@ -90,11 +90,36 @@ class TaskService:
         tasks = tasks_ref.stream()
 
         for task in tasks:
-            # Append each subtask's data to the list
+            # Append each task's data to the list
             tasks_data.append({
 
                 "data": task.to_dict()
             })
 
         return tasks_data
+
+    @staticmethod
+    def fetch_task_with_subtasks( uid, task_id):
+        """
+        Fetch a specific task and all its subtasks for a given user and return the data as a dictionary.
+        """
+        db_instance = FirestoreSingleton().client
+        task_data = {}
+        # Reference to the task document
+        task_ref = db_instance.collection("users").document(uid).collection("Tasks").document(task_id)
+        task = task_ref.get()
+
+        if task.exists:
+            task_data = task.to_dict()  # Get task data
+            # Reference to the subtasks collection within the specific task
+            subtasks_ref = task_ref.collection("Subtasks")
+            subtasks = subtasks_ref.stream()
+
+            # Include all subtasks
+            subtasks_data = [subtask.to_dict() for subtask in subtasks]
+            task_data["subtasks"] = subtasks_data
+        else:
+            task_data = None
+
+        return task_data
 
