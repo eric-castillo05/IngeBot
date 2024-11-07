@@ -11,6 +11,8 @@ class TaskService:
         try:
             # Get Firestore instance
             db_instance = FirestoreSingleton().client
+            task_ref = db_instance.collection('users').document(uid).collection('Tasks').document()
+            task_id = task_ref.id  # Obtener el ID del documento recién creado
 
             task_data = {
                 'title': self.task.title,
@@ -19,6 +21,7 @@ class TaskService:
                 'due_date': self.task.due_date,
                 'priority': self.task.priority,
                 'progress': self.task.progress,
+                'id': task_id,
             }
             # Find "User" document within the "Users" collection with "uid"
             user_ref = db_instance.collection('users').document(uid)
@@ -26,10 +29,10 @@ class TaskService:
             task_ref = user_ref.collection('Tasks').document()
             # Set the task data in Firestore
             task_ref.set(task_data)
-            return True
+            return task_id
         except Exception as e:
             print(f'Error creating task{str(e)}')
-            return False
+            return None
 
     def update_task(self, uid, task_id):
         try:
@@ -92,7 +95,6 @@ class TaskService:
         for task in tasks:
             # Append each task's data to the list
             tasks_data.append({
-
                 "data": task.to_dict()
             })
 

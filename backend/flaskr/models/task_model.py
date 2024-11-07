@@ -24,4 +24,5 @@ class Task:
             'priority': self.priority,
             'due_date': self.due_date,
 
+
         }

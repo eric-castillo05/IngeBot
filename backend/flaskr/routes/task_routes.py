@@ -29,8 +29,9 @@ def create_task():
         task_service = TaskService(task)
 
         # Save task
-        if task_service.create_task(uid):
-            return jsonify({'message': 'Task created successfully.'}), 201
+        task_id = task_service.create_task(uid)
+        if task_id:
+            return jsonify({'message': 'Task created successfully.', 'task_id': task_id}), 201
         else:
             return jsonify({'message': 'Failed to create task.'}), 400
 
@@ -69,8 +70,11 @@ def update_task():
 def delete_task():
     try:
         data = request.json
+        print("Datos recibidos en el servidor:", data)
         uid = data.get('uid')
+        print("UID:", uid)
         task_id = data.get('task_id')
+        print("Task ID:", task_id)
 
         if not uid or not task_id:
             return jsonify({'message': 'Missing required fields'}), 400
@@ -108,9 +112,8 @@ def get_task_data():
 
 @task_bp.route('/tasks/<uid>/get_all', methods=['GET'])
 def get_all_tasks(uid):
-    t = TaskService(None)
     try:
-        tasks = t.fetch_tasks(uid=uid)
+        tasks = TaskService.fetch_tasks(uid=uid)
         if tasks:
             return jsonify(tasks), 200
         else:
@@ -118,7 +121,6 @@ def get_all_tasks(uid):
     except Exception as e:
         print(f"Error retrieving tasks: {str(e)}")
         return jsonify({"message": "Internal server error"}), 500
-
 
 
 
