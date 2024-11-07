@@ -17,7 +17,7 @@ export default function App() {
         <NavigationContainer>
             <Stack.Navigator
                 screenOptions={{
-                    headerShown: true, // Oculta el encabezado en todas las pantallas
+                    headerShown: false, // Oculta el encabezado en todas las pantallas
                 }}
             >
                 <Stack.Screen name="Start" component={StartScreen} />

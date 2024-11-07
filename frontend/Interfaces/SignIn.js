@@ -1,43 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Keyboard, TextInput, TouchableOpacity, StatusBar, TouchableWithoutFeedback, Alert } from 'react-native';
 import axios from 'axios';
 import { CommonActions } from '@react-navigation/native';
-import {Ionicons} from "@expo/vector-icons";
-import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignIn = ({ navigation }) => {
-    const [controlNumber, setControlNumber] = useState(''); // Almacena el número de control
+    const [controlNumber, setControlNumber] = useState('');
     const [password, setPassword] = useState('');
 
-    // Genera el correo electrónico a partir del número de control
     const generateEmail = (controlNumber) => {
         return `L${controlNumber}@zacatepec.tecnm.mx`;
     };
 
     const handleSignIn = async () => {
         try {
-            // Genera el email antes de enviar la solicitud
             const email = generateEmail(controlNumber);
-
-            let response = await axios.post('http://10.177.59.49:5000/users/signin', {
-                email: email,    // Enviamos el email generado
+            const response = await axios.post('http://192.168.0.106:5000/users/signin', {
+                email: email,
                 password: password,
             });
+
             if (response.status === 200) {
-                Alert.alert('Login exitoso');
+                const { localId } = response.data;
+
+                // Guarda el UID en AsyncStorage
+                await AsyncStorage.setItem('userUID', localId);
+                Alert.alert('Inicio de sesión exitoso');
+
+                // Navega al Main y resetea el historial
                 navigation.dispatch(
                     CommonActions.reset({
                         index: 0,
                         routes: [{ name: 'Main' }],
                     })
                 );
-                return;
+            } else {
+                Alert.alert('Error de autenticación', 'No se pudo iniciar sesión. Intenta de nuevo.');
             }
         } catch (error) {
+            console.error('Error en el inicio de sesión:', error);
             if (error.response && error.response.status === 401) {
-                Alert.alert('Número de control o contraseña incorrectos');
+                Alert.alert('Error', 'Número de control o contraseña incorrectos');
             } else {
-                Alert.alert('Error 401');
+                Alert.alert('Error', 'Ocurrió un error en el servidor');
             }
         }
     };

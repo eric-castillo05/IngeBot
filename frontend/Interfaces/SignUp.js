@@ -5,7 +5,7 @@
 
     const SignUp = ({ navigation }) => {
         const [name, setName] = useState('');
-        const [middle_name, setmiddle_name] = useState('');
+        const [middle_name, setMiddle_name] = useState('');
         const [last_name, setLast_name] = useState('');
         const [email, setEmail] = useState('');
         const [control_number, setControl_Number] = useState('');
@@ -15,49 +15,46 @@
 
         const handleSignUp = async () => {
             if (password !== confirmPassword) {
-                Alert.alert('Error', 'Las contraseñas no coinciden');
+                Alert.alert('', 'Las contraseñas no coinciden');
             } else if (password.length < 6) {
-                Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
+                Alert.alert('', 'La contraseña debe tener al menos 6 caracteres');
             } else {
-                // Continue with the sign-up process
-            }
-            return;
+                const registrationData = new FormData();
+                registrationData.append('first_name', name);
+                registrationData.append('last_name', last_name);
+                registrationData.append('middle_name', middle_name);
+                registrationData.append('email', email);
+                registrationData.append('control_number', control_number);
+                registrationData.append('password', password);
 
-            const registrationData = new FormData();
-            registrationData.append('first_name', name);
-            registrationData.append('last_name', last_name);
-            registrationData.append('middle_name', middle_name);
-            registrationData.append('email', email);
-            registrationData.append('control_number', control_number);
-            registrationData.append('password', password);
-
-            // Solo agrega la imagen si se ha seleccionado una
-            if (image) {
-                registrationData.append('image', {
-                    uri: image.uri,
-                    name: 'profile.jpg', // Cambia esto si deseas un nombre dinámico
-                    type: 'image/jpeg',  // Especifica el tipo de archivo como JPEG
-                });
-            }
-
-            try {
-                const response = await fetch('http://10.177.59.49:5000/users/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
-                    body: registrationData,
-                });
-
-                if (response.status === 201) {
-                    Alert.alert('Registro exitoso', 'Tu cuenta ha sido creada correctamente');
-                    navigation.navigate('SignIn');
-                } else {
-                    const errorData = await response.json();
-                    Alert.alert('Error en el registro', errorData.message || 'Hubo un problema con tu registro');
+                if (image) {
+                    registrationData.append('image', {
+                        uri: image.uri,
+                        name: 'profile.jpg',
+                        type: 'image/jpeg',
+                    });
                 }
-            } catch (error) {
-                Alert.alert('Error', 'Error en la conexión al servidor');
+
+                try {
+                    const response = await fetch('http://192.168.0.106:5000/users/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        },
+                        body: registrationData,
+                    });
+
+                    if (response.status === 201) {
+                        Alert.alert('Registro exitoso', 'Tu cuenta ha sido creada correctamente');
+                        navigation.navigate('SignIn');
+                    } else {
+                        const errorData = await response.json();
+                        Alert.alert('Error en el registro', errorData.message || 'Hubo un problema con tu registro');
+                    }
+                } catch (error) {
+                    console.error('Error en la conexión al servidor:', error);
+                    Alert.alert('Error', 'Error en la conexión al servidor');
+                }
             }
         };
 
@@ -92,7 +89,7 @@
                         <View style={styles.circleTopR}></View>
                         <View style={styles.circleTopRR}></View>
 
-                        {/*
+
                         <Ionicons
                             name="arrow-back"
                             size={30}
@@ -100,7 +97,7 @@
                             style={styles.backIcon}
                             onPress={() => navigation.goBack()}
                         />
-                        */}
+
                         <StatusBar barStyle="dark-content" />
                         <Text style={styles.title}>Sign Up</Text>
                         <Text style={styles.subtitle}>Hola! Únete</Text>
@@ -122,14 +119,14 @@
                                 placeholder="Segundo Nombre"
                                 placeholderTextColor="#8c8c8c"
                                 value={middle_name}
-                                onChangeText={setmiddle_name}
+                                onChangeText={setMiddle_name}
                             />
                         </View>
 
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}
-                                placeholder="Apellido"
+                                placeholder="Apellidos"
                                 placeholderTextColor="#8c8c8c"
                                 value={last_name}
                                 onChangeText={setLast_name}
@@ -147,7 +144,6 @@
                         </View>
 
                         <View style={styles.inputContainer}>
-                            <Text style={styles.icon}>🔑</Text>
                             <TextInput
                                 style={styles.input}
                                 placeholder="Contraseña"
@@ -163,7 +159,6 @@
 
 
                         <View style={styles.inputContainer}>
-                            <Text style={styles.icon}>🔑</Text>
                             <TextInput
                                 style={styles.input}
                                 placeholder="Confirmar contraseña"
@@ -215,7 +210,7 @@
             fontSize: 52,
             fontWeight: 'bold',
             color: '#000',
-            marginTop: 50,
+            marginTop: 150,
             alignSelf: 'left',
         },
         subtitle: {

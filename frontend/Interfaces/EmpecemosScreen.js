@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        paddingHorizontal: 10,
+        paddingHorizontal: 0,
     },
     backIcon: {
         position: 'absolute',
@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#000',
         marginTop: 50,
+        paddingHorizontal: 20,
         textAlign: "left",
     },
     subtitle: {
@@ -65,6 +66,7 @@ const styles = StyleSheet.create({
         color: '#808080',
         marginTop: 20,
         textAlign: 'left',
+        paddingHorizontal: 20,
     },
     robotImage: {
         width: 400,

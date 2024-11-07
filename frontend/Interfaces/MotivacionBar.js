@@ -11,7 +11,7 @@ const MotivationalBar = () => {
     const showMessage = async () => {
         if (isVisibleFlag === 1) {  // Solo mostrar si el flag es 1
             try {
-                const response = await fetch('http://10.177.59.49:5000/motivational-message');
+                const response = await fetch('http://192.168.0.106:5000/motivational-message');
                 const data = await response.json();
                 console.log("Mensaje recibido:", data.message);
                 setMessage(data.message);
@@ -52,7 +52,7 @@ const MotivationalBar = () => {
 const styles = StyleSheet.create({
     notificationBar: {
         position: 'absolute',
-        top: 0,
+        top: 120,
         width: '100%',
         padding: 10,
         backgroundColor: '#007AFF',
