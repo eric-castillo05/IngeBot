@@ -114,10 +114,11 @@ def get_all_tasks(uid):
         if tasks:
             return jsonify(tasks), 200
         else:
-            return jsonify({"message": "Subtasks not found"}), 404
-
+            return jsonify({"message": "Tasks not found"}), 404
     except Exception as e:
-        print(f"Error retrieving subtasks: {str(e)}")
+        print(f"Error retrieving tasks: {str(e)}")
+        return jsonify({"message": "Internal server error"}), 500
+
 
 
 
