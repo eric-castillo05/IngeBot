@@ -1,22 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Animated, TouchableWithoutFeedback, StyleSheet, Dimensions, FlatList, Modal, TextInput, SafeAreaView, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Animated, TouchableWithoutFeedback, StyleSheet, Dimensions, FlatList, SafeAreaView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
 const TaskManagementScreen = ({ navigation }) => {
     const [tasks, setTasks] = useState([]);
     const [isSidebarVisible, setSidebarVisible] = useState(false);
-    const [isModalVisible, setModalVisible] = useState(false);
-    const [newTask, setNewTask] = useState({ title: '', description: '', color: '#A8E6CF' });
     const [uid, setUid] = useState(null);
+    const [userName, setUserName] = useState('');
+
 
     const slideAnim = useRef(new Animated.Value(-width)).current;
 
     useEffect(() => {
-        // Obtener el UID del usuario desde AsyncStorage
         const loadUid = async () => {
             try {
                 const storedUid = await AsyncStorage.getItem('userUID');
@@ -29,35 +30,67 @@ const TaskManagementScreen = ({ navigation }) => {
                 Alert.alert("Error", "No se pudo obtener el UID del usuario.");
             }
         };
-
         loadUid();
     }, []);
 
-    useEffect(() => {
-        const fetchTasks = async () => {
-            if (uid) {
-                try {
-                    console.log("UID cargado:", uid); // Verifica si el UID se ha cargado
-                    const response = await fetch(`http://192.168.0.106:5000/tasks/${uid}/get_all`);
-
-                    // Revisa el estado de la respuesta
-                    if (response.ok) {
-                        const tasksData = await response.json();
-                        console.log("Tareas recibidas del servidor:", tasksData); // Verifica los datos recibidos
-                        setTasks(tasksData);
+    const fetchUserData = async () => {
+        if (uid) {
+            try {
+                const response = await fetch(`http://192.168.0.106:5000/users/${uid}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.user) {
+                        // Asumiendo que "user" contiene un campo "name"
+                        setUserName(data.user.name); // Cambia "name" si el campo es diferente
                     } else {
-                        console.log("Error en la respuesta del servidor", response.status); // Agrega el estado de error
-                        Alert.alert('', 'No se encontraron tareas');
+                        Alert.alert('Error', 'No se encontró el nombre del usuario');
                     }
-                } catch (error) {
-                    Alert.alert('Error', 'No se pudo obtener las tareas');
-                    console.error("Error en fetchTasks:", error); // Muestra el error exacto
+                } else {
+                    Alert.alert('Error', 'No se pudo obtener los datos del usuario');
                 }
+            } catch (error) {
+                Alert.alert('Error', 'Hubo un problema al obtener los datos del usuario');
+                console.error("Error en fetchUserData:", error);
             }
-        };
+        }
+    };
 
+
+    useEffect(() => {
+        fetchUserData(); // Llama a esta función cada vez que se cargue el UID
+    }, [uid]);
+
+    const fetchTasks = async () => {
+        if (uid) {
+            try {
+                const response = await fetch(`http://192.168.0.106:5000/tasks/${uid}/get_all`);
+                if (response.ok) {
+                    const tasksData = await response.json();
+                    const formattedTasks = tasksData.map(task => ({ id: task.id, ...task.data }));
+                    setTasks(formattedTasks);
+                    console.log("Tareas obtenidas:", formattedTasks);
+                } else {
+                    Alert.alert('', 'No se encontraron tareas');
+                }
+            } catch (error) {
+                Alert.alert('Error', 'No se pudo obtener las tareas');
+                console.error("Error en fetchTasks:", error);
+            }
+        }
+    };
+
+    useEffect(() => {
         fetchTasks();
-    }, [uid]); // Asegúrate de que fetchTasks se ejecute cuando userUID esté cargado
+    }, [uid]);
+
+    const PriorityColor = (priority) => {
+        switch (priority.toLowerCase()) {  // Convertimos el valor a minúsculas para evitar problemas de mayúsculas
+            case 'high': return '#ff4d4d';
+            case 'medium': return '#ffc500';
+            case 'low': return '#6BCB77';
+            default: return '#A8E6CF';  // Color por defecto en caso de que la prioridad no coincida
+        }
+    };
 
 
     const handleSignOut = async () => {
@@ -105,18 +138,87 @@ const TaskManagementScreen = ({ navigation }) => {
         }
     };
 
-    const toggleModal = () => setModalVisible(!isModalVisible);
 
-    const addTask = () => {
-        setTasks([...tasks, { id: Date.now().toString(), category: 'Hoy', ...newTask, status: '1 de 4' }]);
-        setNewTask({ title: '', description: '', color: '#A8E6CF' });
-        toggleModal();
+    const deleteTask = async (id) => {
+        console.log("ID de la tarea a eliminar:", id);  // Verificar que el ID esté llegando
+        try {
+            const response = await fetch(`http://192.168.0.106:5000/tasks/delete`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uid, task_id: id })
+            });
+
+            if (response.ok) {
+                // Filtra la tarea eliminada del estado 'tasks'
+                setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+                console.log("Tarea eliminada con éxito");
+            } else {
+                Alert.alert('Error', 'No se pudo eliminar la tarea en el servidor.');
+            }
+        } catch (error) {
+            Alert.alert('Error', 'Hubo un problema al intentar eliminar la tarea.');
+            console.error("Error en deleteTask:", error);
+        }
     };
 
-    const deleteTask = (id) => {
-        setTasks(tasks.filter(task => task.id !== id));
-        return;
+    const groupTasksByWeek = (tasks) => {
+        const startOfWeek = moment().startOf('week'); // Inicio de esta semana
+        const endOfWeek = moment().endOf('week'); // Fin de esta semana
+        const startOfNextWeek = moment().add(1, 'week').startOf('week'); // Inicio de la próxima semana
+        const endOfNextWeek = moment().add(1, 'week').endOf('week'); // Fin de la próxima semana
+
+        return {
+            thisWeek: tasks.filter(task => {
+                const dueDate = moment(task.due_date[0], 'DD/MM/YYYY');
+                return dueDate.isBetween(startOfWeek, endOfWeek, null, '[]');
+            }),
+            nextWeek: tasks.filter(task => {
+                const dueDate = moment(task.due_date[0], 'DD/MM/YYYY');
+                return dueDate.isBetween(startOfNextWeek, endOfNextWeek, null, '[]');
+            }),
+            upcoming: tasks.filter(task => {
+                const dueDate = moment(task.due_date[0], 'DD/MM/YYYY');
+                return dueDate.isAfter(endOfNextWeek);
+            }),
+        };
     };
+
+    const groupedTasks = groupTasksByWeek(tasks);
+
+    // Función de renderizado de tarea para mantener limpio el componente principal
+    const renderTask = (task) => (
+        <View style={[styles.taskContainer, { backgroundColor: PriorityColor(task.priority) }]}>
+            <AnimatedCircularProgress
+                size={50}
+                width={5}
+                fill={task.progress}
+                tintColor="#00e0ff"
+                backgroundColor="#3d5875"
+                style={styles.progressCircle}
+            />
+            <View style={{ flex: 1 }}>
+                <Text style={styles.taskTitle}>{task.title}</Text>
+                <Text style={styles.taskDescription}>{task.description}</Text>
+                <Text style={styles.dueDate}>{`Due: ${task.due_date}`}</Text>
+            </View>
+            <TouchableOpacity onPress={() => deleteTask(task.id)}>
+                <Ionicons name="trash-outline" size={width * 0.05} color="black" />
+            </TouchableOpacity>
+        </View>
+    );
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchTasks(); // Llama a fetchTasks cada segundo
+        }, 100000); // 1000 ms = 1 segundo
+
+        return () => clearInterval(interval); // Limpia el intervalo al desmontar
+    }, [uid]);
+
+    useEffect(() => {
+        fetchTasks();
+    }, [uid]);
+
 
 
 
@@ -144,12 +246,20 @@ const TaskManagementScreen = ({ navigation }) => {
                         source={{ uri: 'https://your-image-url.com' }}
                         style={styles.profileImage}
                     />
-                    <Text style={styles.profileName}>Nombre Usuario</Text>
+                    <Text style={styles.profileName}>{userName}</Text>
                 </View>
 
                 <TouchableOpacity style={styles.drawerItem}>
                     <Ionicons name="settings-outline" size={24} color="black" />
                     <Text style={styles.drawerText}>Configuración</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.drawerItem}>
+                    <Ionicons name="shield-checkmark-outline" size={24} color="black" />
+                    <Text style={styles.drawerText}>Privacidad y seguridad</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.drawerItem}>
+                    <Ionicons name="information-circle-outline" size={24} color="black" />
+                    <Text style={styles.drawerText}>Conócenos</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.drawerItem} onPress={handleSignOut}>
                     <Ionicons name="log-out-outline" size={24} color="red" />
@@ -158,18 +268,28 @@ const TaskManagementScreen = ({ navigation }) => {
 
             </Animated.View>
 
-            <Text style={styles.sectionTitle}>Hoy</Text>
+            {/* Tareas de Esta Semana */}
+            <Text style={styles.sectionTitle}>Esta Semana</Text>
             <FlatList
-                data={tasks}
+                data={groupedTasks.thisWeek}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <View style={[styles.taskContainer]}>
-                        <Text style={styles.taskTitle}>{item.title}</Text>
-                        <TouchableOpacity onPress={() => deleteTask(item.id)}>
-                            <Ionicons name="trash-outline" size={width * 0.05} color="black" />
-                        </TouchableOpacity>
-                    </View>
-                )}
+                renderItem={({ item }) => renderTask(item)}
+            />
+
+            {/* Tareas de Próxima Semana */}
+            <Text style={styles.sectionTitle}>Próxima Semana</Text>
+            <FlatList
+                data={groupedTasks.nextWeek}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => renderTask(item)}
+            />
+
+            {/* Tareas Próximamente */}
+            <Text style={styles.sectionTitle}>Próximamente</Text>
+            <FlatList
+                data={groupedTasks.upcoming}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => renderTask(item)}
             />
 
 
@@ -193,7 +313,29 @@ const styles = StyleSheet.create({
     drawerItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10 },
     drawerText: { fontSize: 16, marginLeft: 10 },
     sectionTitle: { fontSize: width * 0.04, fontWeight: 'bold', padding: width * 0.03 },
-    taskContainer: { backgroundColor: '#007AFF' ,flexDirection: 'row', alignItems: 'center', padding: width * 0.04, marginHorizontal: width * 0.02, borderRadius: 10, marginBottom: height * 0.01 },
-    taskTitle: { fontSize: 16, fontWeight: 'bold', flex: 1, color: 'white' },
+    taskContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: width * 0.04,
+        marginHorizontal: width * 0.02,
+        borderRadius: 10,
+        marginBottom: height * 0.01,
+    },
+    taskTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+    taskDescription: {
+        fontSize: 14,
+        color: 'white',
+    },
+    dueDate: {
+        fontSize: 12,
+        color: '#090909',
+    },
+    progressCircle: {
+        marginRight: width * 0.05,  // Adjust margin as needed
+    },
     supportIcon: { position: 'absolute', bottom: height * 0.04, right: width * 0.05, backgroundColor: '#007AFF', padding: 15, borderRadius: 30 },
 });
