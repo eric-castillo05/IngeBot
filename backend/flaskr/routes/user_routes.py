@@ -1,4 +1,3 @@
-
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 
@@ -8,8 +7,9 @@ from flaskr.services.singletons.StorageBucketSingleton import StorageBucketSingl
 from flaskr.services.user_service import UserService
 from firebase_admin import auth
 
-
 user_bp = Blueprint('user', __name__)
+
+
 @user_bp.route('/users/register', methods=['POST'])
 def create_user():
     try:
@@ -29,10 +29,11 @@ def create_user():
             control_number=data.get('control_number'),
             email=data.get('email'),
             password=data.get('password'),
-            image_path=(image_file if image_file is not None else None)  # This will be set after uploading the image if provided
+            image_path=(image_file if image_file is not None else None)
+            # This will be set after uploading the image if provided
         )
 
-         #Required fields including 'email'
+        # Required fields including 'email'
         required_fields = ['first_name', 'middle_name', 'last_name', 'control_number', 'email', 'password']
         missing_fields = [field for field in required_fields if not data.get(field)]
 
@@ -77,9 +78,6 @@ def update_profile_picture(user_uid):
         return jsonify({"message": "Profile picture updated successfully", "url": url}), 200
     else:
         return jsonify({"error": "Failed to update profile picture"}), 500
-
-
-
 
 
 @user_bp.route('/users/delete/<uid>', methods=['DELETE'])
@@ -128,31 +126,28 @@ def update_user(uid):
         return jsonify({'message': f'Error updating user: {str(e)}'}), 500
 
 
-
-
-
 # -------------------GET METHODS -------------------
-#The route '/users/<uid> ONLY returns user's personal information in a json format
-@user_bp.route('/users/<uid>', methods=['GET'])
+# The route '/users/<uid> ONLY returns user's personal information in a json format
+@user_bp.route('/users/<uid>/personal_data', methods=['GET'])
 def get_user_personal_data(uid):
     try:
         user_service = UserService(None)
-        user_data, message = user_service.get_user(uid)
+        user_data, message = user_service.get_user_data(uid)
 
         if user_data:
-            return jsonify({
-                'message': message,
-                'user': user_data
-            }), 200
-        return jsonify({'message': message}), 404
+            return jsonify(user_data), 200
+
 
     except Exception as e:
         return jsonify({'message': f'Error obteniendo usuario: {str(e)}'}), 500
+
 
 """
 This route '/users/<uid>/doc' will return a json that contains users's personal information, as well as
 the information within its subcollections Tasks/Subtasks
 """
+
+
 @user_bp.route('/users/<uid>/doc', methods=['GET'])
 def get_user_doc(uid):
     try:
@@ -168,8 +163,6 @@ def get_user_doc(uid):
         return jsonify({"message": f"Error retrieving User info: {str(e)}"}), 500
 
 
-
-
 @user_bp.route('/users/signin', methods=['POST'])
 def sign_in():
     try:
@@ -181,7 +174,7 @@ def sign_in():
             return jsonify({"message": "Email and password are required"}), 400
 
         # Call the sign-in function
-        u=UserService(None)
+        u = UserService(None)
         response = u.sign_in_with_email_and_password(email, password)
 
         # Check if there is an error in the response

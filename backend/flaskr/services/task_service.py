@@ -9,11 +9,17 @@ class TaskService:
 
     def create_task(self, uid):
         try:
-            # Get Firestore instance
+            # 1.Get Firestore instance
             db_instance = FirestoreSingleton().client
-            task_ref = db_instance.collection('users').document(uid).collection('Tasks').document()
-            task_id = task_ref.id  # Obtener el ID del documento recién creado
+            # 2. GET USER REFERENCE
+            user_ref = db_instance.collection('users').document(uid)
+            # 3. CREATE TASK DOCUMENT AND GET ITS REFERENCE
+            task_ref = user_ref.collection('Tasks').document()
+            # 4. get task_id based on the reference we just created above
+            task_id = task_ref.id  # Obtain the document ID
 
+            # 5. Save task data in a variable for later usage
+            # at this point, the document has been created, but it is empty
             task_data = {
                 'title': self.task.title,
                 'description': self.task.description,
@@ -23,10 +29,7 @@ class TaskService:
                 'progress': self.task.progress,
                 'id': task_id,
             }
-            # Find "User" document within the "Users" collection with "uid"
-            user_ref = db_instance.collection('users').document(uid)
-            #Create a "Task" document based on the "user_ref"
-            task_ref = user_ref.collection('Tasks').document()
+
             # Set the task data in Firestore
             task_ref.set(task_data)
             return task_id
