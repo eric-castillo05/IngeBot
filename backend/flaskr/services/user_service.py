@@ -70,7 +70,7 @@ class UserService:
                 image_url = self.upload_image(image_file, user_record.uid)
                 print(f'Profile image URL: {image_url}')
             else:
-                image_url = None
+                image_url = "https://storage.googleapis.com/ingebot-5c0de.appspot.com/default/profile_avatar/user.png"
 
             user_data = {
                 'uid': user_record.uid,
