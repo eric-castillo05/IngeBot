@@ -29,7 +29,7 @@ def create_user():
             control_number=data.get('control_number'),
             email=data.get('email'),
             password=data.get('password'),
-            image_path=(image_file if image_file is not None else None)
+            image_path=(image_file if image_file is not None else "https://storage.googleapis.com/ingebot-5c0de.appspot.com/default/profile_avatar/user.png")
             # This will be set after uploading the image if provided
         )
 
