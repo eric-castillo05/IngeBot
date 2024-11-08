@@ -17,7 +17,6 @@ const TaskManagementScreen = ({ navigation }) => {
 
     const slideAnim = useRef(new Animated.Value(-width)).current;
 
-
     useEffect(() => {
         const loadUid = async () => {
             try {
@@ -37,12 +36,12 @@ const TaskManagementScreen = ({ navigation }) => {
     const fetchUserData = async () => {
         if (uid) {
             try {
-                const response = await fetch(`http://192.168.0.13:5000/users/${uid}`);
+                const response = await fetch(`http://192.168.0.106:5000//users/${uid}/personal_data`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.user) {
                         // Asumiendo que "user" contiene un campo "name"
-                        setUserName(data.user.name); // Cambia "name" si el campo es diferente
+                        setUserName(data.user.displayName);
                     } else {
                         Alert.alert('Error', 'No se encontró el nombre del usuario');
                     }
@@ -61,9 +60,25 @@ const TaskManagementScreen = ({ navigation }) => {
         fetchUserData(); // Llama a esta función cada vez que se cargue el UID
     }, [uid]);
 
-
-
-    useEffect(() => {
+    const fetchTasks = async () => {
+        if (uid) {
+            try {
+                const response = await fetch(`http://192.168.0.106:5000/tasks/${uid}/get_all`);
+                if (response.ok) {
+                    const tasksData = await response.json();
+                    const formattedTasks = tasksData.map(task => ({ id: task.id, ...task.data }));
+                    setTasks(formattedTasks);
+                    console.log("Tareas obtenidas:", formattedTasks);
+                } else {
+                    Alert.alert('', 'No se encontraron tareas');
+                }
+            } catch (error) {
+                Alert.alert('Error', 'No se pudo obtener las tareas');
+                console.error("Error en fetchTasks:", error);
+            }
+        }
+    };
+   useEffect(() => {
         fetchTasks();
     }, [uid]);
 
@@ -122,24 +137,7 @@ const TaskManagementScreen = ({ navigation }) => {
         }
     };
 
-    const fetchTasks = async () => {
-        if (uid) {
-            try {
-                const response = await fetch(`http://192.168.0.13:5000/tasks/${uid}/get_all`);
-                if (response.ok) {
-                    const tasksData = await response.json();
-                    const formattedTasks = tasksData.map(task => ({ id: task.id, ...task.data }));
-                    setTasks(formattedTasks);
-                    console.log("Tareas obtenidas:", formattedTasks);
-                } else {
-                    Alert.alert('', 'No se encontraron tareas');
-                }
-            } catch (error) {
-                Alert.alert('Error', 'No se pudo obtener las tareas');
-                console.error("Error en fetchTasks:", error);
-            }
-        }
-    };
+
     const deleteTask = async (id) => {
         console.log("ID de la tarea a eliminar:", id);  // Verificar que el ID esté llegando
         try {

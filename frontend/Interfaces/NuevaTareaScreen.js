@@ -10,8 +10,6 @@ const NuevaTareaScreen = ({ navigation }) => {
     const [description, setDescription] = useState('');
     const [deadline, setDeadline] = useState('');
     const [priority, setPriority] = useState('Medium');
-    const [subtasks, setSubtasks] = useState([]);
-    const [newSubtaskText, setNewSubtaskText] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [userUID, setUserUID] = useState('');
 
@@ -56,7 +54,6 @@ const NuevaTareaScreen = ({ navigation }) => {
                 setDescription('');
                 setDeadline('');
                 setPriority('Medium');
-                setSubtasks([]);
                 Alert.alert("Tarea guardada", "La tarea se ha guardado exitosamente.");
                // fetchTasks();
                 navigation.goBack();
@@ -80,20 +77,7 @@ const NuevaTareaScreen = ({ navigation }) => {
         }
     };
 
-    const addSubtask = () => {
-        if (newSubtaskText.trim() !== '') {
-            setSubtasks([...subtasks, { id: Date.now().toString(), text: newSubtaskText, completed: false }]);
-            setNewSubtaskText('');
-        }
-    };
 
-    const toggleSubtask = (id) => {
-        setSubtasks((prevSubtasks) =>
-            prevSubtasks.map((subtask) =>
-                subtask.id === id ? { ...subtask, completed: !subtask.completed } : subtask
-            )
-        );
-    };
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -157,43 +141,6 @@ const NuevaTareaScreen = ({ navigation }) => {
                         <Picker.Item label="Media" value="Medium" />
                         <Picker.Item label="Baja" value="Low" />
                     </Picker>
-                </View>
-
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Subtareas</Text>
-                    <TextInput
-                        placeholder="Añadir subtarea"
-                        style={styles.input}
-                        value={newSubtaskText}
-                        onChangeText={setNewSubtaskText}
-                        onSubmitEditing={addSubtask}
-                    />
-                    <TouchableOpacity style={styles.addButton} onPress={addSubtask}>
-                        <Text style={styles.buttonText}>Añadir Subtarea</Text>
-                    </TouchableOpacity>
-                    <View>
-                        {subtasks.map((subtask) => (
-                            <View key={subtask.id} style={styles.subtaskContainer}>
-                                <TouchableOpacity
-                                    onPress={() => toggleSubtask(subtask.id)}
-                                    style={[
-                                        styles.checkboxContainer,
-                                        subtask.completed && { backgroundColor: '#019863' },
-                                    ]}
-                                >
-                                    {subtask.completed && <Ionicons name="checkmark" size={20} color="white" />}
-                                </TouchableOpacity>
-                                <Text
-                                    style={[
-                                        styles.subtaskText,
-                                        subtask.completed && { textDecorationLine: 'line-through' },
-                                    ]}
-                                >
-                                    {subtask.text}
-                                </Text>
-                            </View>
-                        ))}
-                    </View>
                 </View>
 
                 <View style={styles.footer}>
