@@ -69,8 +69,6 @@ const TaskManagementScreen = ({ navigation }) => {
                     const formattedTasks = tasksData.map(task => ({ id: task.id, ...task.data }));
                     setTasks(formattedTasks);
                     console.log("Tareas obtenidas:", formattedTasks);
-                } else {
-                    Alert.alert('', 'No se encontraron tareas');
                 }
             } catch (error) {
                 Alert.alert('Error', 'No se pudo obtener las tareas');
@@ -186,7 +184,10 @@ const TaskManagementScreen = ({ navigation }) => {
 
     // Función de renderizado de tarea para mantener limpio el componente principal
     const renderTask = (task) => (
-        <View style={[styles.taskContainer, { backgroundColor: PriorityColor(task.priority) }]}>
+        <TouchableOpacity
+            onPress={() => navigation.navigate('Subtask', { taskId: task.id })}
+            style={[styles.taskContainer, { backgroundColor: PriorityColor(task.priority) }]}
+        >
             <AnimatedCircularProgress
                 size={50}
                 width={5}
@@ -203,8 +204,9 @@ const TaskManagementScreen = ({ navigation }) => {
             <TouchableOpacity onPress={() => deleteTask(task.id)}>
                 <Ionicons name="trash-outline" size={width * 0.05} color="black" />
             </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     );
+
 
     useEffect(() => {
         const interval = setInterval(() => {

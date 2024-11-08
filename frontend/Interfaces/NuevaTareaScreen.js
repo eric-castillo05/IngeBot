@@ -37,7 +37,6 @@ const NuevaTareaScreen = ({ navigation }) => {
             due_date: deadline,
             priority,
             uid: userUID,  // Usa el userUID obtenido en el efecto
-            subtasks,
         };
 
         try {
