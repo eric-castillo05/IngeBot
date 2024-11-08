@@ -4,7 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+/*import TaskManagementScreen. from './MainScreen'*/
 const NuevaTareaScreen = ({ navigation }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -43,7 +43,7 @@ const NuevaTareaScreen = ({ navigation }) => {
         };
 
         try {
-            const response = await fetch('http://192.168.0.106:5000/tasks/create', {
+            const response = await fetch('http://192.168.0.13:5000/tasks/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,6 +58,7 @@ const NuevaTareaScreen = ({ navigation }) => {
                 setPriority('Medium');
                 setSubtasks([]);
                 Alert.alert("Tarea guardada", "La tarea se ha guardado exitosamente.");
+               // fetchTasks();
                 navigation.goBack();
             } else {
                 Alert.alert("Error", "No se pudo guardar la tarea");
