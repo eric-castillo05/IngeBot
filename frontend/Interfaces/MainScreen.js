@@ -36,12 +36,12 @@ const TaskManagementScreen = ({ navigation }) => {
     const fetchUserData = async () => {
         if (uid) {
             try {
-                const response = await fetch(`http://192.168.0.106:5000/users/${uid}`);
+                const response = await fetch(`http://192.168.0.106:5000//users/${uid}/personal_data`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.user) {
                         // Asumiendo que "user" contiene un campo "name"
-                        setUserName(data.user.name); // Cambia "name" si el campo es diferente
+                        setUserName(data.user.displayName);
                     } else {
                         Alert.alert('Error', 'No se encontró el nombre del usuario');
                     }
@@ -78,8 +78,7 @@ const TaskManagementScreen = ({ navigation }) => {
             }
         }
     };
-
-    useEffect(() => {
+   useEffect(() => {
         fetchTasks();
     }, [uid]);
 
@@ -210,7 +209,7 @@ const TaskManagementScreen = ({ navigation }) => {
     useEffect(() => {
         const interval = setInterval(() => {
             fetchTasks(); // Llama a fetchTasks cada segundo
-        }, 100000); // 1000 ms = 1 segundo
+        }, 10000); // 1000 ms = 1 segundo
 
         return () => clearInterval(interval); // Limpia el intervalo al desmontar
     }, [uid]);
