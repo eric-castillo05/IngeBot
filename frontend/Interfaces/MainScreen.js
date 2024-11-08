@@ -5,6 +5,7 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
+import MotivacionBar from "./MotivacionBar";
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,6 +14,7 @@ const TaskManagementScreen = ({ navigation }) => {
     const [isSidebarVisible, setSidebarVisible] = useState(false);
     const [uid, setUid] = useState(null);
     const [userName, setUserName] = useState('');
+    const [userPhoto, setUserPhoto] = useState('');
 
 
     const slideAnim = useRef(new Animated.Value(-width)).current;
@@ -36,12 +38,17 @@ const TaskManagementScreen = ({ navigation }) => {
     const fetchUserData = async () => {
         if (uid) {
             try {
-                const response = await fetch(`http://192.168.0.106:5000//users/${uid}/personal_data`);
+                const response = await fetch(`http://192.168.0.106:5000/users/${uid}/personal_data`);
                 if (response.ok) {
                     const data = await response.json();
-                    if (data.user) {
-                        // Asumiendo que "user" contiene un campo "name"
-                        setUserName(data.user.displayName);
+                    if (data.display_name) {
+                        setUserName(`${data.display_name} ${data.middle_name} ${data.last_name}`);
+                        if (data.image_path) {
+                            // Asegúrate de que `setUserPhoto` esté configurado para manejar `{ uri: URL }`
+                            setUserPhoto({ uri: data.image_path });
+                        } else {
+                            Alert.alert('Info', 'El usuario no tiene foto');
+                        }
                     } else {
                         Alert.alert('Error', 'No se encontró el nombre del usuario');
                     }
@@ -54,6 +61,7 @@ const TaskManagementScreen = ({ navigation }) => {
             }
         }
     };
+
 
 
     useEffect(() => {
@@ -188,6 +196,7 @@ const TaskManagementScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Subtask', { taskId: task.id })}
             style={[styles.taskContainer, { backgroundColor: PriorityColor(task.priority) }]}
         >
+
             <AnimatedCircularProgress
                 size={50}
                 width={5}
@@ -195,7 +204,15 @@ const TaskManagementScreen = ({ navigation }) => {
                 tintColor="#00e0ff"
                 backgroundColor="#3d5875"
                 style={styles.progressCircle}
-            />
+            >
+                {
+                    (fill) => (
+                        <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+                            {`${Math.round(fill)}%`}
+                        </Text>
+                    )
+                }
+            </AnimatedCircularProgress>
             <View style={{ flex: 1 }}>
                 <Text style={styles.taskTitle}>{task.title}</Text>
                 <Text style={styles.taskDescription}>{task.description}</Text>
@@ -230,6 +247,7 @@ const TaskManagementScreen = ({ navigation }) => {
                     <Ionicons name="menu" size={width * 0.06} color="black" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Gestión de tareas</Text>
+                <MotivacionBar/>
                 <TouchableOpacity onPress={() => navigation.navigate('NuevaTarea')}>
                     <Ionicons name="add-circle" size={width * 0.06} color="black" />
                 </TouchableOpacity>
@@ -244,7 +262,7 @@ const TaskManagementScreen = ({ navigation }) => {
             <Animated.View style={[styles.sidebar, { transform: [{ translateX: slideAnim }] }]}>
                 <View style={styles.profileContainer}>
                     <Image
-                        source={{ uri: 'https://your-image-url.com' }}
+                        source={userPhoto}
                         style={styles.profileImage}
                     />
                     <Text style={styles.profileName}>{userName}</Text>
@@ -258,7 +276,7 @@ const TaskManagementScreen = ({ navigation }) => {
                     <Ionicons name="shield-checkmark-outline" size={24} color="black" />
                     <Text style={styles.drawerText}>Privacidad y seguridad</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.drawerItem}>
+                <TouchableOpacity style={styles.drawerItem} onPress={() => navigation.navigate('Conocenos')}>
                     <Ionicons name="information-circle-outline" size={24} color="black" />
                     <Text style={styles.drawerText}>Conócenos</Text>
                 </TouchableOpacity>
@@ -307,13 +325,32 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#F2F2F2' },
     header: { flexDirection: 'row', padding: height * 0.02, alignItems: 'center', justifyContent: 'space-between' },
     headerTitle: { fontSize: width * 0.05, fontWeight: 'bold' },
-    sidebar: { position: 'absolute', width: '70%', height: '100%', backgroundColor: '#f2f2f2', padding: width * 0.04, zIndex: 2 },
-    overlay: { position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1 },
-    profileContainer: { alignItems: 'center', marginBottom: height * 0.04 },
-    profileImage: { width: 80, height: 80, borderRadius: 40, marginBottom: 10 },
-    drawerItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10 },
-    drawerText: { fontSize: 16, marginLeft: 10 },
-    sectionTitle: { fontSize: width * 0.04, fontWeight: 'bold', padding: width * 0.03 },
+    sidebar: { position: 'absolute', width: '70%', height: '120%', backgroundColor: '#f2f2f2', padding: width * 0.04, zIndex: 3 },
+    overlay: { position: 'absolute', width: '100%', height: '120%', backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 2 },
+    profileContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: height * 0.08,
+        marginTop: height * 0.07
+    },
+    profileImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        marginRight: 10 // Add some space between the image and the text
+    },
+    profileName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        flex: 1, // This will make the text take up the remaining space
+        textAlign: 'center' // Center the text within its container
+    },
+    drawerItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10
+    },drawerText: { fontSize: 16, marginLeft: 10 },
+    sectionTitle: { fontSize: width * 0.04, fontWeight: 'bold', padding: width * 0.03, marginTop: height * 0.04 },
     taskContainer: {
         flexDirection: 'row',
         alignItems: 'center',

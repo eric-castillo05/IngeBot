@@ -1,94 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TextInput, Button, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { useAzureBot } from './useAzureBot';
 
-const AzureChatbot = () => {
-    const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState([]);
+const ChatBotScreen = () => {
+    const { messages, enviarMensaje } = useAzureBot();
+    const [inputText, setInputText] = useState('');
 
-    const sendMessage = () => {
-        if (message.trim() !== '') {
-            // Send the message to the Azure bot
-            setMessages([...messages, { text: message, isUser: true }]);
-            setMessage('');
-
-            // Display the bot's response
-            setMessages([...messages, { text: 'Bot response', isUser: false }]);
+    const handleSend = () => {
+        if (inputText.trim()) {
+            enviarMensaje(inputText);
+            setInputText('');
         }
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.chatContainer}>
-                {messages.map((msg, index) => (
-                    <View
-                        key={index}
-                        style={[
-                            styles.messageContainer,
-                            msg.isUser ? styles.userMessage : styles.botMessage
-                        ]}
-                    >
-                        <Text style={styles.messageText}>{msg.text}</Text>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={90}
+        >
+            <FlatList
+                data={messages}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                    <View style={[styles.messageBubble, item.sender === 'bot' ? styles.botBubble : styles.userBubble]}>
+                        <Text style={styles.messageText}>{item.text}</Text>
                     </View>
-                ))}
-            </View>
+                )}
+                inverted
+            />
+
             <View style={styles.inputContainer}>
                 <TextInput
-                    style={styles.input}
-                    value={message}
-                    onChangeText={setMessage}
-                    placeholder="Type your message"
+                    style={styles.textInput}
+                    placeholder="Escribe tu mensaje..."
+                    value={inputText}
+                    onChangeText={setInputText}
                 />
-                <Button title="Send" onPress={sendMessage} />
+                <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+                    <Text style={styles.sendButtonText}>Enviar</Text>
+                </TouchableOpacity>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 
+export default ChatBotScreen;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    chatContainer: {
-        flex: 1,
-        width: '100%',
-        padding: 16,
-        overflow: 'scroll'
-    },
-    messageContainer: {
-        padding: 12,
-        borderRadius: 8,
-        marginVertical: 4
-    },
-    userMessage: {
-        backgroundColor: '#DCF8C6',
-        alignSelf: 'flex-end'
-    },
-    botMessage: {
-        backgroundColor: '#F0F0F0',
-        alignSelf: 'flex-start'
-    },
-    messageText: {
-        fontSize: 16
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 8
-    },
-    input: {
-        flex: 1,
-        height: 40,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        marginRight: 8
-    }
+    container: { flex: 1, backgroundColor: '#f2f2f2', padding: 30, justifyContent: 'flex-end' },
+    messageBubble: { padding: 10, borderRadius: 8, marginVertical: 4, maxWidth: '80%' },
+    botBubble: { backgroundColor: '#ececec', alignSelf: 'flex-start' },
+    userBubble: { backgroundColor: '#007AFF', alignSelf: 'flex-end' },
+    messageText: { color: '#fff' },
+    inputContainer: { flexDirection: 'row', padding: 10, alignItems: 'center' },
+    textInput: { flex: 1, backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 10, height: 50 },
+    sendButton: { marginLeft: 10, backgroundColor: '#007AFF', borderRadius: 8, padding: 10 },
+    sendButtonText: { color: '#fff', fontWeight: 'bold' },
 });
-
-export default AzureChatbot;

@@ -13,10 +13,8 @@ const SubtaskScreen = ({ route, navigation }) => {
                     const data = await response.json();
                     setSubtasks(data);
                 } else {
-                    Alert.alert("Error", "No se pudieron obtener las subtareas.");
                 }
             } catch (error) {
-                Alert.alert("Error", "Hubo un problema al obtener las subtareas.");
             }
         };
         fetchSubtasks();
@@ -45,7 +43,7 @@ export default SubtaskScreen;
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#F2F2F2', padding: 20 },
-    header: { fontSize: 20, fontWeight: 'bold', marginBottom: 20 },
+    header: { fontSize: 20, fontWeight: 'bold', marginTop: 40, alignSelf: 'center' },
     subtaskContainer: { padding: 15, marginBottom: 10, backgroundColor: '#fff', borderRadius: 5 },
     subtaskTitle: { fontSize: 16, fontWeight: 'bold' },
     subtaskDescription: { fontSize: 14, color: '#666' },

@@ -40,7 +40,7 @@ const NuevaTareaScreen = ({ navigation }) => {
         };
 
         try {
-            const response = await fetch('http://192.168.0.13:5000/tasks/create', {
+            const response = await fetch('http://192.168.0.106:5000/tasks/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

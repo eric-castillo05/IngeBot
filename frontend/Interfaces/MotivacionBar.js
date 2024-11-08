@@ -52,8 +52,8 @@ const MotivationalBar = () => {
 const styles = StyleSheet.create({
     notificationBar: {
         position: 'absolute',
-        top: 120,
-        width: '100%',
+        top: 60,
+        width: '110%',
         padding: 10,
         backgroundColor: '#007AFF',
         alignItems: 'center',
