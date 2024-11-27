@@ -90,7 +90,7 @@ class UserService:
             print(f'Error creating user or adding to Firestore: {str(e)}')
             return False
 
-    def upload_image(self, image_file, user_uid: str):
+    def upload_imageupload_image(self, image_file, user_uid: str):
         try:
             import os
             # Define temporary directory and create if it doesn't exist
